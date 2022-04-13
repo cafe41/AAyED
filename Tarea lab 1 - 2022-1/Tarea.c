@@ -109,36 +109,38 @@ void cicloPrint(int* arreglo, int n){
     }
 }
 //sobrescribirArreglo, función que sobrescribe los valores de un arreglo por otros
-//DOM: arreglo (quién se sobrescribe) X arreglo (por quién se sobrescribe) X int (Hasta dónde sobrescribir) X int (dónde va nuestra m)
+//DOM: arreglo (quién se sobrescribe) X arreglo (por quién se sobrescribe) X int (desde dónde sobrescribir) X int (Hasta dónde sobrescribir) 
 //REC: void
-int* sobrescribirArreglo(int* arreglo1, int* arreglo2, int n, int m){
+int* sobrescribirArreglo(int* arreglo1, int* arreglo2, int x, int n){
     size_t j=0;
-    for (size_t i = m; i < n; i++){
+    for (size_t i = x; i < n; i++){
         arreglo1[i]=arreglo2[j];
         j++;
     }
     return arreglo1;
 }
 //swapG, función que invierte las posiciones de un arreglo
-//DOM: arreglo X int (cantidad de carácteres del arreglo) X int (posición del swap)
+//DOM: arreglo X int (cantidad de carácteres del arreglo) X int (cantidad total de carácteres)
 //REC: void
-void swapG(int* arreglo, int n, int x){
-    int* arreglo2 = (int *) malloc (sizeof(int *)*n);
-    for (size_t i = 0; i < n; i++){
-        arreglo2[i]=arreglo[n-i-1];
+void swapG(int* arreglo, int c, int n){
+    int* arreglo2 = (int *) malloc (sizeof(int *)*c);
+    int j;
+    for (size_t i = n; i > c; i=i-1){
+        arreglo2[j]=arreglo[i]; j++; printf("[j]= %d, [i]= %d, arreglo[i]= %d",j,i,arreglo[i]);
     }
-    printf("\nEl arreglo2 es: "); cicloPrint(arreglo2,n);
-    arreglo = sobrescribirArreglo(arreglo,arreglo2,n,0);
-    escribirMovimientos(archivoSalida, n, x);
+    printf("\nEl arreglo2 es: "); cicloPrint(arreglo2,c);
+    arreglo = sobrescribirArreglo(arreglo,arreglo2,n-c,n);
+    escribirMovimientos(archivoSalida, n-c, n);
 }
 //subArreglo, función que divide un arreglo en una forma que sea útil para hacer el swap y sobrescribir 
 //DOM: arreglo X int (x, donde inicia nuestro nuevo arreglo) X int (n)
 //REC: arreglo
 int* subArreglo(int* arreglo, int x, int n){
     int* arregloCorto = (int *) malloc (sizeof(int *)*(n-x));
-    for (size_t i = 0; i < (n-x); i++){
-        arregloCorto[i]=arreglo[i+x];
-        printf("POS: %d, el numero a agregar es: %d, ",i+x,arreglo[i+x]);
+    int j = 0;
+    for (size_t i = n-1; i > x; i=i-1){
+        arregloCorto[j]=arreglo[i];printf("[j]= %d;[i-1]= %d;",j,i-1);
+        j++;
     }
     return arregloCorto;
 }
@@ -185,8 +187,8 @@ int* funcOrden(int* arreglo, int n){
         else {//lo que hace la función es invertir el "que viene" de los números, para luego dar vuelta todo n-1
             for(size_t j = n; j > m; j=j-1){ //recorre la función de j -> n
                 if (arreglo[n-1]==listaMayMe[m]){//movimiento 1
-                    printf("\naplicamos un swap 1:"); swapG(arreglo,n-m,m+1); //swapG de m a n
-                    cicloPrint(arreglo,n);
+                    printf("\naplicamos un swap 1:"); swapG(arreglo,m,n); //swapG de m a n 
+                    cicloPrint(arreglo,n); //DOM: arreglo X int (cantidad de carácteres del arreglo) X int (posición del swap)
                     j=n;
                 }
                 else if (arreglo[j]==listaMayMe[m]){//movimiento 2
@@ -194,9 +196,8 @@ int* funcOrden(int* arreglo, int n){
                     //Realmente, desconozco el por qué todo tiene que ser j+1
                     int* arregloT=subArreglo(arreglo,n-(j),n);
                     printf("\narregloT:"); cicloPrint(arregloT,(n-j));
-                    printf("\naplicamos un swap 2:"); swapG(arregloT,n-j,n-m);
-                    printf("\narregloT swappeado:"); cicloPrint(arregloT,(n-j));
-                    arreglo = sobrescribirArreglo(arreglo,arregloT,n,m);
+                    //printf("\naplicamos un swap 2:"); //swapG(arregloT,n-j,n);
+                    arreglo = sobrescribirArreglo(arreglo,arregloT,n-j,n);
                     cicloPrint(arreglo,n);
                     j=n;
                 }
@@ -221,7 +222,10 @@ int main(int argc, char const *argv[]){
     FILE* archivo = fopen(archivoSalida, "w");
     //Llamamos a nuestra gran función que ordena el arreglo:
     arreglo = funcOrden(arreglo,n);
-    cicloPrint(arreglo, n);
-    fclose(archivo);
+    cicloPrint(arreglo, n);/*
+    int* subA = subArreglo(arreglo,2,n); cicloPrint(subA, 4);
+    cicloPrint(subA, 4);
+    sobrescribirArreglo(arreglo,subA,n-2,n); cicloPrint(arreglo, n);
+    fclose(archivo);*/
     return 0;
 }
