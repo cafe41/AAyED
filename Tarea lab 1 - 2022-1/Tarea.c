@@ -81,7 +81,7 @@ int* leerArchivoPorNumero(const char* filename, int* arreglo){
     return arreglo;
 }
 //escribirMovimientos, función que escribe los movimientos al archivo de texto y también los "imprime" por consola
-//DOM: str (nombre archivo) X arreglo X m (Posición donde se realizó el movimiento)
+//DOM: str (nombre archivo) X int (m) X int (j) (Posición donde se realizó el movimiento)
 //REC: void, pero realiza un print y escribe en un archivo txt
 void escribirMovimientos(const char* filename, int m, int j){
     FILE* archivo = fopen(filename, "a");
@@ -120,15 +120,16 @@ int* sobrescribirArreglo(int* arreglo1, int* arreglo2, int n, int m){
     return arreglo1;
 }
 //swapG, función que invierte las posiciones de un arreglo
-//DOM: arreglo X int (cantidad de carácteres del arreglo) X int (cantidad total de carácteres del arreglo)
+//DOM: arreglo X int (cantidad de carácteres del arreglo) X int (posición del swap)
 //REC: void
-void swapG(int* arreglo, int m, int n){
-    int* arreglo2 = (int *) malloc (sizeof(int *)*m);
-    for (size_t i = 0; i < m; i++){
-        arreglo2[i]=arreglo[m-i-1];
+void swapG(int* arreglo, int n, int x){
+    int* arreglo2 = (int *) malloc (sizeof(int *)*n);
+    for (size_t i = 0; i < n; i++){
+        arreglo2[i]=arreglo[n-i-1];
     }
-    arreglo = sobrescribirArreglo(arreglo,arreglo2,m,0);
-    escribirMovimientos(archivoSalida, m, n);
+    printf("\nEl arreglo2 es: "); cicloPrint(arreglo2,n);
+    arreglo = sobrescribirArreglo(arreglo,arreglo2,n,0);
+    escribirMovimientos(archivoSalida, n, x);
 }
 //subArreglo, función que divide un arreglo en una forma que sea útil para hacer el swap y sobrescribir 
 //DOM: arreglo X int (x, donde inicia nuestro nuevo arreglo) X int (n)
@@ -182,18 +183,19 @@ int* funcOrden(int* arreglo, int n){
             m++;
         }
         else {//lo que hace la función es invertir el "que viene" de los números, para luego dar vuelta todo n-1
-            for(size_t j = 0; j < n; j++){ //recorre la función de j -> n
-                if (arreglo[m]==listaMayMe[m]){//movimiento 1
-                    printf("\naplicamos un swap 1:"); swapG(arreglo,m+1,n-m); //swapG de 0 a m
+            for(size_t j = n; j > m; j=j-1){ //recorre la función de j -> n
+                if (arreglo[n-1]==listaMayMe[m]){//movimiento 1
+                    printf("\naplicamos un swap 1:"); swapG(arreglo,n-m,m+1); //swapG de m a n
                     cicloPrint(arreglo,n);
                     j=n;
                 }
                 else if (arreglo[j]==listaMayMe[m]){//movimiento 2
+                    printf("[%d] = %d\n",j,arreglo[j]);
                     //Realmente, desconozco el por qué todo tiene que ser j+1
-                    int* arregloT=subArreglo(arreglo,j+1,n);
-                    printf("arregloT:"); cicloPrint(arregloT,(n));
-                    printf("\naplicamos un swap 2:"); swapG(arregloT,n-m,m+1);
-                    printf("arregloT swappeado:"); cicloPrint(arregloT,(n-m));
+                    int* arregloT=subArreglo(arreglo,n-(j),n);
+                    printf("\narregloT:"); cicloPrint(arregloT,(n-j));
+                    printf("\naplicamos un swap 2:"); swapG(arregloT,n-j,n-m);
+                    printf("\narregloT swappeado:"); cicloPrint(arregloT,(n-j));
                     arreglo = sobrescribirArreglo(arreglo,arregloT,n,m);
                     cicloPrint(arreglo,n);
                     j=n;
