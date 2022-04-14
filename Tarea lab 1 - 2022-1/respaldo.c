@@ -81,9 +81,9 @@ int* leerArchivoPorNumero(const char* filename, int* arreglo){
     return arreglo;
 }
 //escribirMovimientos, función que escribe los movimientos al archivo de texto y también los "imprime" por consola
-//DOM: str (nombre archivo) X int (m) X int (j) (Posición donde se realizó el movimiento)
+//DOM: str (nombre archivo) X arreglo X m (Posición donde se realizó el movimiento)
 //REC: void, pero realiza un print y escribe en un archivo txt
-void escribirMovimientos(const char* filename, int j){
+void escribirMovimientos(const char* filename, int m, int j){
     FILE* archivo = fopen(filename, "a");
     printf(" V(%d)->",(j));
     fprintf(archivo,"%d",(j));
@@ -109,38 +109,32 @@ void cicloPrint(int* arreglo, int n){
     }
 }
 //sobrescribirArreglo, función que sobrescribe los valores de un arreglo por otros
-//DOM: arreglo (quién se sobrescribe) X arreglo (por quién se sobrescribe) X int (desde dónde sobrescribir) X int (Hasta dónde sobrescribir) 
+//DOM: arreglo (quién se sobrescribe) x arreglo (por quién se sobrescribe) x int (Hasta dónde sobrescribir)
 //REC: void
-int* sobrescribirArreglo(int* arreglo1, int* arreglo2, int x, int n){
-    size_t j=0;
-    for (size_t i = x; i < n; i++){
-        arreglo1[i]=arreglo2[j];
-        j++;
+int* sobrescribirArreglo(int* arreglo1, int* arreglo2, int n){
+    for (size_t i = 0; i < n; i++){
+        arreglo1[i]=arreglo2[i];
     }
     return arreglo1;
 }
 //swapG, función que invierte las posiciones de un arreglo
-//DOM: arreglo X int (cantidad de carácteres del arreglo) X int (cantidad total de carácteres)
+//DOM: arreglo X int (cantidad de carácteres del arreglo) X int (cantidad total de carácteres del arreglo)
 //REC: void
-void swapG(int* arreglo, int c, int n){
-    int* arreglo2 = (int *) malloc (sizeof(int *)*(n-c));
-    int j = 0;
-    for (size_t i = n-1; i+1 > c; i=i-1){
-        arreglo2[j]=arreglo[i];
-        j++;
+void swapG(int* arreglo, int m, int n){
+    int* arreglo2 = (int *) malloc (sizeof(int *)*m);
+    for (size_t i = 0; i < m; i++){
+        arreglo2[i]=arreglo[m-i-1];
     }
-    arreglo = sobrescribirArreglo(arreglo,arreglo2,c,n);
-    escribirMovimientos(archivoSalida, c+1);
+    arreglo = sobrescribirArreglo(arreglo,arreglo2,m);
+    escribirMovimientos(archivoSalida, m, n);
 }
 //subArreglo, función que divide un arreglo en una forma que sea útil para hacer el swap y sobrescribir 
 //DOM: arreglo X int (x, donde inicia nuestro nuevo arreglo) X int (n)
 //REC: arreglo
 int* subArreglo(int* arreglo, int x, int n){
-    int* arregloCorto = (int *) malloc (sizeof(int *)*(n-x));
-    int j = 0;
-    for (size_t i = n-1; i+1 > x; i=i-1){
-        arregloCorto[j]=arreglo[i];
-        j++;
+    int* arregloCorto = (int *) malloc (sizeof(int *)*(n-x-1));
+    for (size_t i = 0; i < n; i++){
+        arregloCorto[i]=arreglo[i+x];
     }
     return arregloCorto;
 }
@@ -160,40 +154,41 @@ int isOrdenado(int* arreglo, int n){
 //DOM: arreglo X n (largo arreglo original)
 //REC: arreglo
 int* crearListaOrdenada(int* arreglo, int n){
-    int* listaMayMe = (int *) malloc (sizeof(int *)*n);
+    int* listaMenMa = (int *) malloc (sizeof(int *)*n);
     int* arregloC = (int *) malloc (sizeof(int *)*n);
     for (size_t i = 0; i < n; i++){ arregloC[i]=arreglo[i]; }
     arregloC = bubbleSort(arregloC, n);
-    for (size_t i = 0; i < n; i++){ listaMayMe[i]=arregloC[n-i-1]; }
-    return listaMayMe;
+    for (size_t i = 0; i < n; i++){ listaMenMa[i]=arregloC[n-i-1]; }
+    return listaMenMa;
 }
 //funcOrden, función que en base a varias preguntas, ordena un arreglo al "intercambiar" ciertas partes
 //DOM: arreglo X int (n)
 //REC: arreglo (ordenado)
 int* funcOrden(int* arreglo, int n){
     //Trabajaremos con la lista ordenada, para ver qué número es el siguiente que buscamos ordenar
-    int* listaMayMe = crearListaOrdenada(arreglo, n);
+    int* listaMenMa = crearListaOrdenada(arreglo, n);
     int m = 0; //trabajaremos con un m, que irá recorriendo la lista de mayor a menor
     //El siguiente ciclo se enfocará en ordenar el arreglo:
     while (m != n){ //mientras no hayamos ordenado hasta el último de los valores:
         printf("\nHasta el momento ");
         cicloPrint(arreglo,n);
-        if (arreglo[m]==listaMayMe[m]){//si el valor "final" es igual al mayor de los números (hasta m):
-            printf("\nEl numero %d esta ordenado\n",listaMayMe[m]);
+        printf("y nuestro m es: %d\n",m);
+        if (arreglo[m]==listaMenMa[m]){//si el valor "final" es igual al mayor de los números (hasta m):
+            printf("\nEl numero %d esta ordenado, le sumamos 1 a m\n",listaMenMa[m]);
             m++;
         }
         else {//lo que hace la función es invertir el "que viene" de los números, para luego dar vuelta todo n-1
-            for(size_t j = n; j > m; j=j-1){ //recorre la función de j -> n
-                if (arreglo[n-1]==listaMayMe[m]){//movimiento 1
-                    swapG(arreglo,m,n); //swapG de m a n 
-                    cicloPrint(arreglo,n); //DOM: arreglo X int (cantidad de carácteres del arreglo) X int (posición del swap)
+            for(size_t j = 0; j < n; j++){ //recorre la función de j -> n
+                if (arreglo[n-m]==listaMenMa[m]){//movimiento 1
+                    printf("\naplicamos un swap 1:"); swapG(arreglo,m+1,j+1); //swapG de 0 a m
+                    cicloPrint(arreglo,n);
                     j=n;
                 }
-                else if (arreglo[j]==listaMayMe[m]){//movimiento 2
-                    int* arregloT=subArreglo(arreglo,n-j,n);
-                    printf("\nsi invertimos el arreglo desde %d",listaMayMe[m]); cicloPrint(arregloT,(n-j));
-                    arreglo = sobrescribirArreglo(arreglo,arregloT,j,n);
-                    escribirMovimientos(archivoSalida, j+1);
+                else if (arreglo[j]==listaMenMa[m]){//movimiento 2
+                    //Realmente, desconozco el por qué todo tiene que ser j+1
+                    int* arregloT=subArreglo(arreglo,m,j+1);
+                    printf("\naplicamos un swap 2:"); swapG(arregloT,j+1,j+1);
+                    arreglo = sobrescribirArreglo(arreglo,arregloT,j+1);
                     cicloPrint(arreglo,n);
                     j=n;
                 }
@@ -219,10 +214,6 @@ int main(int argc, char const *argv[]){
     //Llamamos a nuestra gran función que ordena el arreglo:
     arreglo = funcOrden(arreglo,n);
     cicloPrint(arreglo, n);
-    //Luego de escribir los movimientos del algoritmo en el archivo de Salida, 
-    //terminamos escribiendo en "0" que simboliza el fin
-    escribirMovimientos(archivoSalida, 0);
     fclose(archivo);
-    printf("\n\nFin del programa, puede revisar los resultado en el archivo de salida\n");
     return 0;
 }
