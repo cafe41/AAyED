@@ -117,9 +117,10 @@ int* sobrescribirArreglo(int* arreglo1, int* arreglo2, int x, int n){
         arreglo1[i]=arreglo2[j];
         j++;
     }
+    free(arreglo2); //Liberamos la memoria del "arreglo2"
     return arreglo1;
 }
-//swapG, función que invierte las posiciones de un arreglo
+//swapG, función que sobrescribe un arreglo sobre otro
 //DOM: arreglo X int (cantidad de carácteres del arreglo) X int (cantidad total de carácteres)
 //REC: void
 void swapG(int* arreglo, int c, int n){
@@ -130,13 +131,14 @@ void swapG(int* arreglo, int c, int n){
         j++;
     }
     arreglo = sobrescribirArreglo(arreglo,arreglo2,c,n);
+    free(arreglo2); //Liberamos la memoria del "arreglo2"
     escribirMovimientos(archivoSalida, c+1);
 }
 //subArreglo, función que divide un arreglo en una forma que sea útil para hacer el swap y sobrescribir 
 //DOM: arreglo X int (x, donde inicia nuestro nuevo arreglo) X int (n)
 //REC: arreglo
 int* subArreglo(int* arreglo, int x, int n){
-    int* arregloCorto = (int *) malloc (sizeof(int *)*(n-x));
+    int* arregloCorto = (int *) malloc (sizeof(int *)*(n));
     int j = 0;
     for (size_t i = n-1; i+1 > x; i=i-1){
         arregloCorto[j]=arreglo[i];
@@ -186,7 +188,7 @@ int* funcOrden(int* arreglo, int n){
             for(size_t j = n; j > m; j=j-1){ //recorre la función de j -> n
                 if (arreglo[n-1]==listaMayMe[m]){//movimiento 1
                     swapG(arreglo,m,n); //swapG de m a n 
-                    cicloPrint(arreglo,n); //DOM: arreglo X int (cantidad de carácteres del arreglo) X int (posición del swap)
+                    cicloPrint(arreglo,n);
                     j=n;
                 }
                 else if (arreglo[j]==listaMayMe[m]){//movimiento 2
@@ -200,6 +202,7 @@ int* funcOrden(int* arreglo, int n){
             }
         } 
     }
+    free(listaMayMe);
     return arreglo;
 }
 
@@ -219,10 +222,14 @@ int main(int argc, char const *argv[]){
     //Llamamos a nuestra gran función que ordena el arreglo:
     arreglo = funcOrden(arreglo,n);
     cicloPrint(arreglo, n);
+    //No necesitamos el arreglo para el archivo de salida, por lo que es mejor liberarlo
+    free(arreglo); 
     //Luego de escribir los movimientos del algoritmo en el archivo de Salida, 
-    //terminamos escribiendo en "0" que simboliza el fin
+    //terminamos escribiendo un "0" que simboliza el fin
     escribirMovimientos(archivoSalida, 0);
-    fclose(archivo);
+    //Cerramos el archivo abierto y liberamos la memoria que lo contenía.
+    fclose(archivo); free(archivo);
+    //Fin del programa
     printf("\n\nFin del programa, puede revisar los resultado en el archivo de salida\n");
     return 0;
 }

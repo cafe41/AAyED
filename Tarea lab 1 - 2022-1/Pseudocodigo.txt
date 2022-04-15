@@ -1,0 +1,69 @@
+sobrescribirArreglo(arreglo A1, arreglo A2, num x, num n): arreglo
+    num j<- 0
+    FOR i<-x TO n, step 1
+        A1[i]<-A2[j]
+        j<-j+1
+    free(A2)
+    RETURN A1
+
+swapG(arreglo A, num c, num n): void
+    ...Asignamos memoria a un segundo arreglo
+    arreglo A2<- malloc(arreglo*(sizeof(arreglo)*(n-c))) 
+    num j<- 0
+    FOR i<- n-1 TO c, step i-1
+        A2[j]<-A[i]
+        j<- j+1
+    A <- sobrescribirArreglo(A,A2,c,n)
+    free(A2)
+    escribirMovimientos(archivoSalida, c+1)
+
+subArreglo(arreglo A, num x, num n):arreglo
+    ...Asignamos memoria a un arreglo "corto"
+    arreglo Acorto<- malloc(arreglo*(sizeof(arreglo)*(n))) 
+    num j<- 0
+    FOR i<- n-1 TO x, step i-1
+        Acorto[j]<-A[i]
+        j<- j+1
+    RETURN Acorto
+
+escribirMovimientos(arreglo (const char) filename, num j): void
+    ...filename es un arreglo de const char, el cuál es el nombre de un archivo
+    FILE archivo <- fopen(filename, "a")
+    ...FILE es un struct que se usa para llamar archivos
+    ...La función fopen abre el archivo filename, en este caso con una modalidad "a"
+    ...La modalidad "a" escribe sobre el archivo sin sobrescribirlo, a diferencia de "w"
+    ...Realizamos un print del movimiento por consola, con un display de "V(posición)->"
+    printf("V(j)->") ...j está en la entrada
+    ...la función fprintf sirve para escribir dentro de un archivo
+    ...fprintf(FILE, tipo de dato a escribir, elemento a escribir):
+    fprintf(archivo, "%d", j) ...%d se usa para escribir num dentro de un archivo
+    fprintf(archivo, "%s", " ") ...%s se usa para escribir string dentro del archivo
+
+    funcOrden(arreglo A, num n): arreglo
+        ...crearListaOrdenada crea una copia ordenada del arreglo
+        arreglo MayorMenor<- crearListaOrdenada(A, n)
+        ...Lo usaremos de guía, ya que la función lo irá comparando
+        num m<- 0 
+        ...m servirá para comparar posiciones en el arreglo
+        WHILE (m <> n) DO
+            printf("Hasta el momento ") ...Para realizar seguimiento
+            ...cicloPrint es un ciclo de prints para imprimir arreglos
+            cicloPrint(A,n) ...cicloPrint(arreglo,num):void
+            IF (A[n-1]=MayorMenor[m]) THEN
+                printf("\nEl numero MayorMenor[m] está ordenado")
+                m<- m+1
+            ELSE
+                FOR j<- n TO m step j-1 ...de n a m, m < n
+                    IF (A[n-1] = MayorMenor[m]) THEN ...MOVIMIENTO 1
+                        swapG(A,m,n)
+                        cicloPrint(A,n) ...seguimiento
+                        j<-n ... para terminar el ciclo
+                    ELSE IF (A[j] = MayorMenor[m]) THEN ...MOVIMIENTO 2
+                        arreglo AT<- subArreglo(A,n-j,n) ...Definimos un subArreglo de A
+                        printf("Si invertimos el arreglo desde MayorMenor[m]")
+                        cicloPrint(AT,(n-j)) ...imprimimos el subarreglo por consola
+                        A<- sobrescribirArreglo(A,AT,j,n)
+                        escribirMovimientos(archivoSalida, j+1)
+                        j<- n ...Terminar ciclo
+    free(MayorMenor) ...Liberamos la memoria del arreglo local
+    RETURN A
