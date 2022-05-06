@@ -1,10 +1,14 @@
+//Laboratorio 8
+//NOMBRE: GUSTAVO VERGARA
+//SECCIÓN: 0-B-2
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "TDAgrafo.h"
 
 int main() 
 {
-
+	//Estas lineas venian por defecto:
 	TDAgrafo* grafo;
 
 	grafo=leerGrafoNoDirigido("Grafito.in");
@@ -12,30 +16,23 @@ int main()
 	printf("Matriz de adyacencia: \n");
 	imprimirMatrizAdyacencia(grafo);
 	printf("----------\n");
-
+	//Creamos una listaEnlazada, con los adyacentes del 0 (1 y 2)
 	TDAlista* listaE = obtenerAdyacentes(grafo,0);
-	recorrerLista(listaE);
+	recorrerLista(listaE); //La imprimimos por consola
+	//Comprobamos si hay camino en la lsta definida anteriormente (1 y 2)
 	EsCamino(grafo,listaE);
+	//Creamos una nueva lista, llamada "secuencia"
 	TDAlista* secuencia = crearListaVacia();insertarInicio(secuencia,2);insertarInicio(secuencia,1);insertarInicio(secuencia,4);insertarInicio(secuencia,3); insertarInicio(secuencia,2); insertarInicio(secuencia,0);
-	recorrerLista(secuencia);
+	recorrerLista(secuencia); //La imprimimos por consola
+	//Comprobamos si el contenido de secuencia es camino
 	EsCamino(grafo,secuencia);
+	//Comprobamos si el contenido de secuencia es ciclo
 	EsCiclo(grafo,secuencia);
-	insertarNodoFinal(secuencia,0);
-	recorrerLista(secuencia);
+	eliminarFinal(secuencia); insertarNodoFinal(secuencia,3); insertarNodoFinal(secuencia,2); insertarNodoFinal(secuencia,0);
+	recorrerLista(secuencia); //La imprimimos por consola
+	//Comprobamos si el contenido de secuencia es ciclo nuevamente
 	EsCiclo(grafo,secuencia);
-	// int vertA = 1;
-	// int vertB = 3;
-	// if (adyacenciaNodos(grafo,vertA,vertB)) 
-	// {
-	// 	printf("Los vertices %d y %d son adyacentes\n", vertA, vertB);
-	// }
-	// else 
-	// {
-	//  	printf("Los vertices %d y %d no son adyacentes\n", vertA, vertB);
-	// }	
-
+	//Liberamos memoria
+	free(grafo);free(secuencia);
 	return 0;
 }
-
-
-

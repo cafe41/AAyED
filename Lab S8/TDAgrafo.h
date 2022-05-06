@@ -1,3 +1,7 @@
+	//Laboratorio 8
+	//NOMBRE: GUSTAVO VERGARA
+	//SECCIÓN: 0-B-2
+	
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include "TDAlista.h"
@@ -79,6 +83,9 @@
 	}
 
 	//Actividad 1
+	//obtenerAdyacentes, funcion que obtiene los valores adyacentes del nodo actual
+	//DOM: TDAgrafo X vertice (int)
+	//REC: listaEnlazada
 	TDAlista* obtenerAdyacentes(TDAgrafo* grafo, int vertice){
 		int v = vertice;
 		TDAlista* lista = crearListaVacia();
@@ -91,6 +98,9 @@
 		return lista;
 	}
 	//Actividad 2
+	//esCamino, entrega 1 (true) si hay camino entre toda la secuencia entregada (lista enlazada), sino 0 (false)
+	//DOM: grafo X listaEnlazada
+	//REC: int (bool)
 	int EsCamino( TDAgrafo* grafo, TDAlista* secuencia ){ //asumo que secuencia son 2 nodos entre los que debería haber camino [1]-[4], por ejemplo
 		nodo* auxiliar = secuencia->inicio;
 		while(auxiliar->siguiente != NULL){
@@ -106,16 +116,19 @@
 	}
 
 	//Actividad 3
+	//esCiclo, función que entrega un 1 (true), si se genera un ciclo dentro de la secuencia entregada,
+	//un ciclo se genera cuando a través de más de 3 caminos, vuelve a aparecer el valor inicial de la secuencia.
+	//DOM: grafo X listaEnlazada
+	//REC: int (bool)
 	int EsCiclo( TDAgrafo* grafo, TDAlista* secuencia){ //La secuencia debería ser de largo mayor a 2
-		nodo* auxiliar = secuencia->inicio; int i;
+		nodo* auxiliar = secuencia->inicio; int i = 0;
 		while(auxiliar->siguiente != NULL){
-			printf("aux = %d",auxiliar->dato);
 			if (adyacenciaNodos(grafo,auxiliar->dato+1,auxiliar->siguiente->dato+1) == 0) {
 				printf("Los nodos %d y %d no son adyacentes, por lo que la secuencia no puede ser un ciclo.\n",auxiliar->dato,auxiliar->siguiente->dato);
 				return 0;
 			}
-			else if (i >= 3) { //solo si i >= 3
-				if (auxiliar->dato == secuencia->inicio->dato) { //compara el dato de aux con el dato de la secuencia
+			else if (i >= 3) { //solo si i >= 3 (informacion sacada del ppt)
+				if (auxiliar->dato == secuencia->inicio->dato || auxiliar->siguiente->dato == secuencia->inicio->dato) { //compara el dato de aux con el dato de la secuencia
 					printf("La secuencia es un ciclo.\n");
 					return 1;
 				}
@@ -126,13 +139,3 @@
 		printf("La secuencia no es un ciclo.\n");
 		return 0;
 	}
-
-
-
-
-
-
-
-
-
-
