@@ -17,5 +17,10 @@ int main()
   recorrerLista(lista);
   insertarNodoDespues(lista, 10, 2);
   recorrerLista(lista);
+  eliminarFinal(lista);
+  recorrerLista(lista);
+  eliminarDato(lista, 4);
+  recorrerLista(lista);
+  printf("El dato del nodo es: %d y su siguiente es: %d",obtenerNodo(lista,1)->dato,obtenerNodo(lista,1)->siguiente->dato);
   return 0;
 }
