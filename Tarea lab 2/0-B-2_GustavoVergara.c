@@ -137,6 +137,7 @@ TDAsemana* organizarSemana(TDAlista* listaE, TDAsemana* semana){
         }
         auxiliar = auxiliar->siguiente; 
     }
+    return semana;
 }
 //horariosFaltantes, esta función recibe una semana y retorna los horarios que falta cubrir de la semana, como lista enlazada
 //DOM: semana X listaEnlazada
