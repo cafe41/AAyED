@@ -24,7 +24,7 @@ int main(int argc, char const *argv[])
 	desencolar(cola); imprimirCola(cola);		
 	*/
 
-	recorridoProfundidad(grafo,5);
+	recorridoProfundidad(grafo,0);
 	return 0;
 }
 

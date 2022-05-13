@@ -143,27 +143,6 @@
 		return 0;
 	}
 
-	//Función extra:
-	//cicloPrint, 
-	//DOM:
-	//REC:
-	//reciclada del lab 4
-	void cicloPrint(int* arreglo, int n){
-		for(size_t i = 0; i < n; i++){
-			if (n==1) {
-				printf("\nel arreglo es: (%d)\n", arreglo[i]);
-			}
-			else if (i==0) {
-				printf("\nel arreglo es: (%d, ", arreglo[i]);
-			}
-			else if (i==n-1){
-				printf("%d) \n", arreglo[i]);
-			}
-			else {
-			printf("%d, ", arreglo[i]);
-			}
-		}
-	}
 	//Actividad 1 - Lab 9
 	//recorridoProfundidad,
 	//DOM: TDAgrafo X vertice (int)
@@ -173,24 +152,23 @@
 		int* visitados = calloc(grafo->cvertices,sizeof(int*)); //arreglo con ceros, de tamaño cvertices e int*
 		apilar(S, vertice);
 		while(!esPilaVacia(S)){
-			cicloPrint(visitados,grafo->cvertices); 
 			int u = S->tope->dato;
 			desapilar(S);
-			if (visitados[u-1] == 0) {
-				visitados[u-1] = 1;
+			if (visitados[u] == 0) {
+				visitados[u] = 1;
 				printf("%d Esta visitado\n",u);
 				TDAlista* lista = obtenerAdyacentes(grafo,u);
 				nodo* aux = lista->inicio;
 				while(aux != NULL){
-					if (visitados[aux->dato - 1] == 0) {
+					if (visitados[aux->dato] == 0) {
 						apilar(S,aux->dato);
-						printf("Adyacente = %d\n", S->tope->dato);
-						
 					}
-					recorrerLista(lista);
 					aux = aux->siguiente;
 				}
 			}
-			cicloPrint(visitados,grafo->cvertices); 
 		}
 	}
+
+	//recorridoAnchura
+	//DOM:
+	//REC:
