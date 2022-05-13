@@ -1,10 +1,12 @@
-	//Laboratorio 8
+	//Laboratorio 8 y 9
 	//NOMBRE: GUSTAVO VERGARA
 	//SECCIÓN: 0-B-2
 	
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include "TDAlista.h"
+	#include "C:\Users\gvergara\GIT\AAyED\Lab S9\TDAlista.h"
+	#include "C:\Users\gvergara\GIT\AAyED\Lab S9\TDApila.h"
+	#include "C:\Users\gvergara\GIT\AAyED\Lab S9\TDAcola.h"
 
 	/*------------- estructura de datos -------------*/
 
@@ -39,6 +41,7 @@
 		
 		for (i = 0; i < grafo->cvertices; i++) 
 		{
+			printf("%d | ", i);
 			for (j = 0; j < grafo->cvertices; j++) 
 			{
 				printf("%d ", grafo->adyacencias[i][j]);
@@ -82,7 +85,7 @@
 		}
 	}
 
-	//Actividad 1
+	//Actividad 1 - Lab 8
 	//obtenerAdyacentes, funcion que obtiene los valores adyacentes del nodo actual
 	//DOM: TDAgrafo X vertice (int)
 	//REC: listaEnlazada
@@ -97,7 +100,7 @@
 		}
 		return lista;
 	}
-	//Actividad 2
+	//Actividad 2 - Lab 8
 	//esCamino, entrega 1 (true) si hay camino entre toda la secuencia entregada (lista enlazada), sino 0 (false)
 	//DOM: grafo X listaEnlazada
 	//REC: int (bool)
@@ -115,7 +118,7 @@
 		return 1; // 1 = true
 	}
 
-	//Actividad 3
+	//Actividad 3 - Lab 8
 	//esCiclo, función que entrega un 1 (true), si se genera un ciclo dentro de la secuencia entregada,
 	//un ciclo se genera cuando a través de más de 3 caminos, vuelve a aparecer el valor inicial de la secuencia.
 	//DOM: grafo X listaEnlazada
@@ -138,4 +141,56 @@
 		}
 		printf("La secuencia no es un ciclo.\n");
 		return 0;
+	}
+
+	//Función extra:
+	//cicloPrint, 
+	//DOM:
+	//REC:
+	//reciclada del lab 4
+	void cicloPrint(int* arreglo, int n){
+		for(size_t i = 0; i < n; i++){
+			if (n==1) {
+				printf("\nel arreglo es: (%d)\n", arreglo[i]);
+			}
+			else if (i==0) {
+				printf("\nel arreglo es: (%d, ", arreglo[i]);
+			}
+			else if (i==n-1){
+				printf("%d) \n", arreglo[i]);
+			}
+			else {
+			printf("%d, ", arreglo[i]);
+			}
+		}
+	}
+	//Actividad 1 - Lab 9
+	//recorridoProfundidad,
+	//DOM: TDAgrafo X vertice (int)
+	//REC: VOID
+	void recorridoProfundidad(TDAgrafo* grafo, int vertice){
+		TDApila* S = crearPilaVacia(100);
+		int* visitados = calloc(grafo->cvertices,sizeof(int*)); //arreglo con ceros, de tamaño cvertices e int*
+		apilar(S, vertice);
+		while(!esPilaVacia(S)){
+			cicloPrint(visitados,grafo->cvertices); 
+			int u = S->tope->dato;
+			desapilar(S);
+			if (visitados[u-1] == 0) {
+				visitados[u-1] = 1;
+				printf("%d Esta visitado\n",u);
+				TDAlista* lista = obtenerAdyacentes(grafo,u);
+				nodo* aux = lista->inicio;
+				while(aux != NULL){
+					if (visitados[aux->dato - 1] == 0) {
+						apilar(S,aux->dato);
+						printf("Adyacente = %d\n", S->tope->dato);
+						
+					}
+					recorrerLista(lista);
+					aux = aux->siguiente;
+				}
+			}
+			cicloPrint(visitados,grafo->cvertices); 
+		}
 	}

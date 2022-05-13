@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "tdagrafo.h": "c",
+        "tdapila.h": "c",
+        "tdalista.h": "c",
+        "tdacola.h": "c"
+    }
+}

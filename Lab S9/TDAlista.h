@@ -16,6 +16,7 @@ typedef struct listaGenerica
 
 
 /*------------- operaciones -------------*/
+//Estas funciones no fueron definidas por mi, por lo que no veo sentido en documentarlas.
 
 TDAlista* crearListaVacia()
 {
@@ -69,12 +70,19 @@ void eliminarInicio(TDAlista* lista)
 
 
 /*------------- Actividad 2 -------------*/
+
+//liberarLista, función que libera la memoria de la lista enlazada
+//DOM: listaEnlazada
+//REC: void
 void liberarLista(TDAlista* lista){
   while(!esListaVacia(lista)){
     eliminarInicio(lista);
   }
 }
 
+//buscarDato, función que busca un dato dentro de la lista, imprime 1 si está, 0 si no.
+//DOM: listaEnlazada X dato (int)
+//REC: "boolean" (1 o 0)
 int buscarDato(TDAlista* lista, int dato){
   nodo* auxiliar=lista->inicio;
   while(auxiliar != NULL){
@@ -86,7 +94,9 @@ int buscarDato(TDAlista* lista, int dato){
   return 0;
 }
 
-//Función extra, para imprimir "buscarDato". Dom: lista, dato. Rec: void, sale un print por consola.
+//existeDato, función extra, para imprimir "buscarDato". Dom: lista, dato. Rec: void, sale un print por consola.
+//DOM: listaEnlazada x dato (int)
+//REC: VOID
 void existeDato(TDAlista* lista, int dato){
   if (buscarDato(lista, dato) == 1) {
     printf("El numero %d esta dentro de la lista\n", dato);
@@ -97,6 +107,9 @@ void existeDato(TDAlista* lista, int dato){
   
 }
 
+//obtenerNumeroNodos, función que retorna la cantidad de nodos de la lista
+//DOM: listaEnlazada
+//REC: int
 int obtenerNumeroNodos(TDAlista* lista){
   int i = 0;
   nodo* auxiliar=lista->inicio;
@@ -108,6 +121,10 @@ int obtenerNumeroNodos(TDAlista* lista){
 }
 
 /*------------- Actividad 3 -------------*/
+
+//insertarNodoFinal, función que inserta un nodo con un dato, al final de una lista
+//DOM: listaEnlazada x dato (int)
+//REC: VOID
 void insertarNodoFinal(TDAlista* lista, int dato){
   nodo* auxiliar=lista->inicio;
   while(auxiliar->siguiente != NULL){
@@ -119,6 +136,9 @@ void insertarNodoFinal(TDAlista* lista, int dato){
   auxiliar->siguiente = nuevo;
 }
 
+//insertarNodoDespues, función que agrega un nodo después de otro nodo, según el dato de este.
+//DOM: listaEnlazada x dato (int) x datoAnterior (int)
+//REC: VOID
 void insertarNodoDespues(TDAlista* lista, int dato, int datoAnterior){
   nodo* auxiliar=lista->inicio;
   while(auxiliar->dato != datoAnterior){
@@ -130,6 +150,9 @@ void insertarNodoDespues(TDAlista* lista, int dato, int datoAnterior){
   auxiliar->siguiente = nuevo;
 }
 
+//eliminarFinal, función que elimina el final de una lista enlazada
+//DOM: listaEnlazada
+//REC: VOID
 void eliminarFinal(TDAlista* lista){
   nodo* auxiliar=lista->inicio;
   while(auxiliar->siguiente != NULL){
@@ -143,6 +166,9 @@ void eliminarFinal(TDAlista* lista){
   free(auxiliar);
 }
 
+//eliminarDato, función que elimina un nodo según el dato que tenga.
+//DOM: listaEnlazada x dato (int)
+//REC: VOID
 void eliminarDato(TDAlista* lista, int dato){
   nodo* auxiliar=lista->inicio;
   while(auxiliar->dato != dato){
@@ -156,6 +182,9 @@ void eliminarDato(TDAlista* lista, int dato){
   free(auxiliar);
 }
 
+//obtenerNodo, función que entrega el nodo en cierta posición, dentro de una lista enlazada.
+//DOM: listaEnlazada x posición (int)
+//REC: TDAnodo
 nodo* obtenerNodo(TDAlista* lista, int posicion){
   nodo* auxiliar=lista->inicio;
   for (size_t i = 0; i < posicion; i++)

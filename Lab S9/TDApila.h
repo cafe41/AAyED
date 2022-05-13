@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+//#include "C:\Users\gvergara\GIT\AAyED\Lab S6\TDAlista.h"
 
 /*------------- estructura de datos -------------*/
-
+/*
 typedef struct nodoGenerico
 {
   int dato;
   struct nodoGenerico* siguiente;
 }nodo;
-
+*/
 typedef struct
 {
   int capacidad;
