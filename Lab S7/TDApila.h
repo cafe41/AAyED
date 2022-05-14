@@ -84,8 +84,8 @@ nodo* tope(TDApila* pila){
 
 /*------------- Actividad 4 -------------*/
 //buscarDatoPila, función que desapila una pila hasta encontrar cierto dato, si lo encuentra retornará 1, sino 0.
-//DOM:
-//REC:
+//DOM: TDApila X dato (int)
+//REC: boolean (1 si está, 0 si no)
 int buscarDatoPila(TDApila* pila, int dato){
   //Crear pila auxiliar para "ordenar nuevamente" a como estaba la pila
   TDApila* pilaAux = crearPilaVacia(pila->capacidad);

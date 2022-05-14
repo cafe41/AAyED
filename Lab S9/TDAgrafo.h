@@ -5,6 +5,8 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include "TDAlista.h"
+	#include "TDApila.h"
+	#include "TDAcola.h"
 
 	/*------------- estructura de datos -------------*/
 
@@ -138,4 +140,71 @@
 		}
 		printf("La secuencia no es un ciclo.\n");
 		return 0;
+	}
+
+	//Actividad 1 - Lab 9
+	//recorridoProfundidad, función que recorre un grafo a través del método de "profundidad"
+	//Este es un método que va viendo los vertices adyacentes al vertice que se le de y los 
+	//agrega a una pila, luego repite el proceso con los adyacentes a estos y asi recorre todo el 
+	//grafo. Cuando termine la funcion, esta nos dirá si este es conexo o no.
+	//DOM: TDAgrafo X vertice (int)
+	//REC: VOID (pero imprimirá los resultados por consola)
+	void recorridoProfundidad(TDAgrafo* grafo, int vertice){
+		printf("Recorrido por profundidad: \n");
+		TDApila* S = crearPilaVacia(100); //le puse 100 para marcar un máximo, dudo que llegue a más de 100 a menos que sea forzado a
+		int* visitados = calloc(grafo->cvertices,sizeof(int*)); //arreglo con ceros, de tamaño cvertices e int*
+		apilar(S, vertice); //apilamos el vertice inicial (entregado en el dominio) a la pila S
+		while(!esPilaVacia(S)){ //mientras la pila no este vacia
+			int u = S->tope->dato;
+			desapilar(S); //Desapilamos, pues le dimos el dato a "u"
+			if (visitados[u] == 0) { //Si u no ha sido visitado:
+				visitados[u] = 1;    //lo marcamos como visitado
+				printf("%d Esta visitado\n",u);
+				TDAlista* lista = obtenerAdyacentes(grafo,u); //y apilamos sus adyacentes
+				nodo* aux = lista->inicio;
+				while(aux != NULL){
+					if (visitados[aux->dato] == 0) {
+						apilar(S,aux->dato);
+					}
+					aux = aux->siguiente;
+				}
+			}
+		}
+		//Esto imprimirá según la cantidad de numeros no-visitados, si el grafo es conexo o no
+		int x = 0; 
+		for (int i = 0; i < grafo->cvertices; i++){if (visitados[i] == 0){x++;}}
+		if (x > 0){printf("No todos los vertices han sido visitados, el grafo es desconexo\n");}
+		else{printf("Todos los vertices fueron visitados, el grafo es conexo.\n");}
+	}
+	//recorridoAnchura, función que recorre un grafo a través del método de "anchura"
+	//Este es un método que va viendo los vertices adyacentes al vertice que se le de y los 
+	//agrega a una cola, luego repite el proceso con los adyacentes a estos y asi recorre todo el 
+	//grafo. Cuando termine la funcion, esta nos dirá si este es conexo o no.
+	//DOM: TDAgrafo X vertice (int)
+	//REC: VOID (pero imprimirá los resultados por consola)
+	void recorridoAnchura(TDAgrafo* grafo, int vertice){
+		printf("Recorrido por anchura: \n");
+		TDAcola* Q = crearColaVacia(100); //le puse 100 para marcar un máximo, dudo que llegue a más de 100 a menos que sea forzado a
+		int* visitados = calloc(grafo->cvertices,sizeof(int*)); //creamos una lista con 0
+		visitados[vertice] = 1; printf("%d Esta visitado\n",vertice); //marcamos el primer vertice como visitado
+		encolar(Q,vertice); //encolamos el vertice
+		while (!esColaVacia(Q)){ //Mientras la cola no este vacia
+			int w = Q->frente->dato;
+			desencolar(Q); //desencolamos la cola, ya que lo asignamos a w
+			TDAlista* lista = obtenerAdyacentes(grafo,w);
+			nodo* aux = lista->inicio; //aux apunta al inicio de la lista con los adyacentes de w
+			while (aux != NULL){
+				if (visitados[aux->dato] == 0) { //si el dato en aux no ha sido visitado,
+					encolar(Q,aux->dato);        //encola el dato en Q
+					visitados[aux->dato] = 1;    //y lo marca como visitado
+					printf("%d Esta visitado\n",aux->dato);
+					}
+					aux = aux->siguiente; //aux = siguiente nodo en la lista
+			}
+		}
+		//Esto imprimirá según la cantidad de numeros no-visitados, si el grafo es conexo o no
+		int x = 0; 
+		for (int i = 0; i < grafo->cvertices; i++){if (visitados[i] == 0){x++;}}
+		if (x > 0){printf("No todos los vertices han sido visitados, el grafo es desconexo\n");}
+		else{printf("Todos los vertices fueron visitados, el grafo es conexo.\n");}
 	}

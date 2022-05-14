@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-//#include "C:\Users\gvergara\GIT\AAyED\Lab S6\TDAlista.h"
 
 /*------------- estructura de datos -------------*/
-/*
+/* Se comentó este struct porque genraba conflicto con los definidos en otros TDAs
 typedef struct nodoGenerico
 {
   int dato;
@@ -103,6 +102,8 @@ nodo* final(TDAcola* cola){
 
 //Función extra:
 //imprimirCola, función que imprime el frente y el final de la cola
+//DOM: TDAcola
+//REC: VOID (imprime el inicio y el final de la cola por consola)
 void imprimirCola(TDAcola* cola){
     printf("El frente de la cola es: %d, El final de la cola es: %d\n",cola->frente->dato,cola->final->dato);
 }
