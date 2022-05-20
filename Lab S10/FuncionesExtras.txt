@@ -1,0 +1,26 @@
+//agregar a TDAgrafo.h
+
+//NoDirigido Ponderado
+TDAgrafo* leerGrafoNoDirigidoPonderado(char *nombreArchivo){
+	FILE*pf;		   //para abrir archivo
+	pf = fopen(nombreArchivo,"r");
+	int n_vertices, m_aristas;
+	int i,j,w,k;
+	if (pf ==NULL){
+		printf("Error de archivo\n");
+		return NULL;
+	}else{
+		//Cantidad de nodos y aristas
+		fscanf(pf, "%d %d", &n_vertices,&m_aristas); 		
+		TDAgrafo *G=crearGrafoVacio(n_vertices);	
+		//dependiendo de las lineas de archivo, 
+		// 1 para grafo no dirigido no ponderado
+		for(k=0;k<m_aristas;k++){
+			fscanf(pf,"%d %d %d",&i, &j,&w);
+			G->adyacencias[i-1][j-1] = w;
+			G->adyacencias[j-1][i-1] = w;
+		}
+		fclose(pf);
+		return  G;	
+	}
+}
