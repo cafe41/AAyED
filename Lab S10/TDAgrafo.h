@@ -8,6 +8,10 @@
 	#include "TDApila.h"
 	#include "TDAcola.h"
 
+	//Variables globales
+
+	int* dPadre; int* dDistancia; int* dVisitado;
+
 	/*------------- estructura de datos -------------*/
 
 	typedef struct matrizGrafo 
@@ -109,6 +113,27 @@
 		}
 	}
 
+	//Funciones extra y propias
+	//imprimirArreglo, función que imprime un arreglo
+	//DOM: arreglo X int (largo del arreglo (n))
+	//REC: print del arreglo
+	void imprimirArreglo(int* arreglo, int n){
+		for(size_t i = 0; i < n; i++){
+			if (n==1) {
+				printf("(%d)\n", arreglo[i]);
+			}
+			else if (i==0) {
+				printf("(%d, ", arreglo[i]);
+			}
+			else if (i==n-1){
+				printf("%d) \n", arreglo[i]);
+			}
+			else {
+			printf("%d, ", arreglo[i]);
+			}
+		}
+	}
+
 	//Actividad 1 - Lab 8
 	//obtenerAdyacentes, funcion que obtiene los valores adyacentes del nodo actual
 	//DOM: TDAgrafo X vertice (int)
@@ -118,7 +143,7 @@
 		TDAlista* lista = crearListaVacia();
 		for(size_t i = 0; i < grafo->cvertices; i++){
 			//retorna lista enlazada con adyacentes
-			if (grafo->adyacencias[v][i] == 1) {
+			if (grafo->adyacencias[v][i] >= 1) {
 				insertarInicio(lista,i);
 			}
 		}
@@ -234,4 +259,127 @@
 		else{printf("Todos los vertices fueron visitados, el grafo es conexo.\n");}
 	}
 
-	void Dijkstra(){}
+	//Actividad 1 - Lab 10
+
+	//quedanSinVisitar, función que retorna 0 si no hay vertices por visitar, sino 1
+	//DOM: Arreglo int X int (length arreglo)
+	//REC: boolean (0 o 1)
+	//Función de la actividad 2, pero la usé en la 1 tambien, asi que la moví hacia acá
+	int quedanSinVisitar(int* visitados, int largoVisitados){
+		for (size_t i = 0; i < largoVisitados; i++){ //Quedan sin visitar?
+			if (visitados[i]==0)
+			{
+				return 1; //Si (true)
+			}
+		}
+		return 0; //No (false)
+	}
+
+	//encontrarCamino, función que encuentra un camino entre un vertice y otro (vertice final)
+	//DOM: TDAgrafo X vertice X verticeFinal
+	//REC: TDAlista
+	TDAlista* encontrarCamino(TDAgrafo* grafo, int vertice, int verticeFinal){
+		TDAlista* secuencia = crearListaVacia(); 
+		TDAlista* adyacentes = crearListaVacia(); 
+		int vActual = vertice; nodo* aux;
+		int* visitados = calloc(grafo->cvertices, sizeof(int));
+		visitados[vActual] = 1; //Marcamos el primer vertice, para que no lo tome en cuenta dentro del ciclo
+		insertarInicio(secuencia,vActual);
+		while (vActual != verticeFinal) { //El ciclo se repite para el camino actual, si no ha sido visitado
+			int x = 0; //x es un contador que nos ayudará a salir del while que viene
+			adyacentes = obtenerAdyacentes(grafo, vActual);
+			aux = adyacentes->inicio; 
+			if (!quedanSinVisitar(visitados,grafo->cvertices)){//Si no quedan sin visitar, termina el ciclo con un 0
+				printf("No quedan más vertices que visitar, no hay camino\n");
+				return 0;
+			}
+			//ver qué vertice (que no esté visitado) tiene enlace con el vertice actual
+			else {
+				while (aux != NULL && x != 1){
+					if (buscarDato(adyacentes,verticeFinal)){ //Priorizará el vertice final, si existe arista con él
+						//Ciclo que mueve el aux hasta el dato 
+						while (aux->dato != verticeFinal){
+							aux = aux->siguiente;
+						}
+						//Luego agrega el vertice como si fuese cualquier otro
+						visitados[aux->dato] = 1;
+						vActual = aux->dato;
+						insertarInicio(secuencia,vActual);
+						x = 1;
+					}
+					
+					else if (visitados[aux->dato] != 1){ //Sino, se irá por lo primero que encuentre
+						//Agrega el vertice a la secuencia y lo marca como visitado
+						visitados[aux->dato] = 1;
+						vActual = aux->dato;
+						insertarInicio(secuencia,vActual);
+						x = 1;
+					}
+					aux = aux->siguiente;
+				}
+			}
+		}
+	return secuencia;
+	}
+
+	//Actividad 2 - Lab 10
+
+	//extraerMinimo, algoritmo que retorna la posición del elemento que posea la minima distancia desde el vertice inicial, 
+	//que no haya sido visto
+	//DOM: arreglo int X int
+	//REC: int (posición arreglo)
+	int extraerMinimo(int* dDistancia, int length){
+		int minimo = 9999; //Asumiendo que el peso no es más que 9999
+		int indice;
+		for (size_t i = 0; i < length; i++){
+			if (dVisitado[i]==0){//Si no ha sido visitado
+				if (dDistancia[i] < minimo && dDistancia[i] > 0){
+					minimo = dDistancia[i];
+					indice = i;
+				}
+			}
+		}
+		return indice;
+	}
+
+	//Algoritmo Dijkstra, algoritmo que busca el camino mínimo de un vertice del grafo hacia otros
+	//DOM: TDAgrafo X int (vertice)
+	//REC: VOID
+	//Basado en el pseudocódigo
+	void Dijkstra(TDAgrafo* grafo, int vertice){
+		//Asignamos la memoria a los 3 arreglos:
+		dDistancia = (int*)malloc(sizeof(int *)* grafo->cvertices);
+		dPadre = (int*)malloc(sizeof(int *)* grafo->cvertices);	
+		dVisitado = (int*)malloc(sizeof(int *)* grafo->cvertices);
+		//Les asignamos valores:
+		for (size_t w = 0; w < grafo->cvertices; w++){
+			dPadre[w] = 0;
+			dVisitado[w]= 0;
+			if (grafo->adyacencias[vertice][w] > 0){
+				dDistancia[w]=grafo->adyacencias[vertice][w];
+				dPadre[w]=vertice;
+			}
+			else {
+				dDistancia[w]= 666;
+			}
+		}
+		dDistancia[vertice]= 0;
+		dVisitado[vertice]= 1; //El vertice inicial es marcado como visitado
+		while (quedanSinVisitar(dVisitado,grafo->cvertices)){
+			int u = extraerMinimo(dDistancia,grafo->cvertices);
+			dVisitado[u]= 1;
+			TDAlista* listaAdc = obtenerAdyacentes(grafo,u);//Obtenemo9s una lista de los adyacentes a "u", distintos de 0
+			nodo* aux = listaAdc->inicio;
+			while (aux != NULL){
+				if (dDistancia[aux->dato] > dDistancia[u] + grafo->adyacencias[u][aux->dato]){
+					dDistancia[aux->dato] = dDistancia[u] + grafo->adyacencias[u][aux->dato];
+					dPadre[aux->dato] = u;
+				}
+				aux = aux->siguiente;
+			}	
+		}
+		//Imprimimos los arreglos resultantes:
+		printf("\nDistancia : ");imprimirArreglo(dDistancia,grafo->cvertices);
+		printf("Padres : ");imprimirArreglo(dPadre,grafo->cvertices);
+		printf("Visitados : ");imprimirArreglo(dVisitado,grafo->cvertices);
+	}
