@@ -142,11 +142,11 @@
 		int v = vertice;
 		TDAlista* lista = crearListaVacia();
 		for(size_t i = 0; i < grafo->cvertices; i++){
-			//retorna lista enlazada con adyacentes
 			if (grafo->adyacencias[v][i] >= 1) {
 				insertarInicio(lista,i);
 			}
 		}
+		//retorna lista enlazada con adyacentes
 		return lista;
 	}
 	//Actividad 2 - Lab 8
@@ -452,18 +452,19 @@
 	//esCiclico, función que retorna 1 si el grafo es cíclico, sino un 0.
 	//DOM: TDAgrafo x int (vertice)
 	//REC: int (boolean)
-	int esCiclico(TDAgrafo* grafo, int vertice){
-		TDAcola* Q = crearColaVacia(9999); //le puse 100 para marcar un máximo, dudo que llegue a más de 100 a menos que sea forzado a
+	int esCiclico(TDAgrafo* grafo){
+		TDAcola* Q = crearColaVacia(9999); //le puse 9999 para marcar un máximo, dudo que llegue a más de 9999
 		int* visitados = calloc(grafo->cvertices,sizeof(int*)); //creamos una lista con 0
-		visitados[vertice] = 1; //marcamos el primer vertice como visitado
+		visitados[0] = 1; //marcamos el primer vertice como visitado
 		int recorrido = 0;
 		while(quedanSinVisitar(visitados,grafo->cvertices)){ //si quedan sin visitar:
 			recorrido = recorrido +1;
-			encolar(Q,vertice); //encolamos el vertice
+			encolar(Q,0); //encolamos el vertice
 			while (!esColaVacia(Q)){ //Mientras la cola no este vacia
 				int w = Q->frente->dato;
 				desencolar(Q); //desencolamos la cola, ya que lo asignamos a w
-				TDAlista* lista = obtenerAdyacentes(grafo,w);
+				TDAlista* lista = obtenerAdyacentes(grafo,w); //FALLA ACÁ
+				if (lista->inicio == NULL) {return 0;}
 				nodo* aux = lista->inicio; //aux apunta al inicio de la lista con los adyacentes de w
 				while (aux != NULL){
 					if (visitados[aux->dato] == 0) { //si el dato en aux no ha sido visitado,
@@ -477,8 +478,9 @@
 					aux = aux->siguiente; //aux = siguiente nodo en la lista
 				}
 			}
+			imprimirArreglo(visitados,grafo->cvertices);
 		}
-		free(Q);
+		free(Q); printf("0");
 		return 0;
 	}
 
@@ -500,12 +502,22 @@
 		}
 		//Creamos un nodo auxA y lo llevamos al nodo en la posición index - 1
 		nodoK* auxA = listaKruskal->inicio;
-		for(size_t i = 0; i < index - 1; i++){
+		for(int i = 0; i < index - 1; i++){
 			auxA = auxA->siguiente;
 		}
-		//Creamos un nodo nuevo, con los datos del nodo que debemos tener
-		aux = auxA->siguiente;
-		auxA->siguiente = auxA->siguiente->siguiente;
+		//Asignamos el nodo objetivo a aux, para retornarlo y lo quitamos de la lista
+		if (index == 0) {// si el índice es 0
+			aux = listaKruskal->inicio;
+		}
+		else { //sino, aux es el siguiente de auxA
+			aux = auxA->siguiente;
+		}
+		if(auxA->siguiente!=NULL){ //si el siguiente elemento del nodo aux-1 es null
+			auxA->siguiente = auxA->siguiente->siguiente;
+		}
+		if (index == 0 && listaKruskal->inicio->siguiente == NULL){ //Si solo queda un elemento, se vacía la lista
+			listaKruskal->inicio = NULL;
+		}
 		return aux;
 	}
 
@@ -517,7 +529,6 @@
 		TDAgrafo* grafoKruskal = crearGrafoVacio(grafo->cvertices);
 		int n = grafo->cvertices;
 		int m = 0;
-		printf("A");
 		for(size_t i = 0; i < n; i++){
 			for(size_t j = 0; j < n; j++){
 				if (grafo->adyacencias[i][j] > 0) {
@@ -525,16 +536,25 @@
 				}
 			}
 		}
-		printf("B");
-		while(m<=n-1 && !esListaKVacia(listaKruskal)){
+		while(m<=n-1 && !esListaKVacia(listaKruskal)){ 
 			nodoK* nodoK = extraerMinimoKruskal(listaKruskal);
-			grafoKruskal->adyacencias[nodoK->i][nodoK->j] = nodoK->dato; 
-			if (esCiclico(grafoKruskal, 0)) {
+			grafoKruskal->adyacencias[nodoK->i][nodoK->j] = nodoK->dato;
+			if (esCiclico(grafoKruskal)) {
 				grafoKruskal->adyacencias[nodoK->i][nodoK->j] = 0; 
 			}
-			recorrerListaK(listaKruskal);
-			imprimirMatrizAdyacencia(grafoKruskal);
 		}
-		printf("C");
 		return grafoKruskal;
+	}
+
+	//pesoMST, función que suma todos los pesos de las aristas de un grafo
+	//DOM: TDAgrafo
+	//REC: int
+	int pesoMST(TDAgrafo* grafo){
+		int pesoTotal= 0;
+		for (int i = 0; i < grafo->cvertices; i++){
+			for (int j = 0; j < grafo->cvertices; j++){
+				pesoTotal = pesoTotal + grafo->adyacencias[i][j];
+			}
+		}
+		return pesoTotal;
 	}
