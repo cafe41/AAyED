@@ -15,7 +15,7 @@ const char* archivoSalida;
 
 //Definición de funciones
 
-//leerCVertices, función que en base a lo escrito en el archivo de entrada.in ovtiene el numero de vertices
+//leerDatos, función que en base a lo escrito en el archivo de entrada.in ovtiene el numero de vertices
 //DOM: char (nombre archivo)
 //REC: int
 int* leerDatos(const char *nombreArchivo){
@@ -163,7 +163,7 @@ int* sumaDijkstrasCuarteles(int*** arregloDijkstras, int* cuarteles, int c, int 
 	return arregloSumas;
 }
 //sumaDijkstras, arreglo con el total de la suma de las distancias para cada vertice
-//DOM: arreglo de arreglos (int***) X int
+//DOM: arreglo de arreglos (int***) X arreglo (int*) X int X int
 //REC: arreglo de int (int*)
 int* sumaDijkstras(int*** arregloDijkstras, int* cuarteles, int c, int v){
 	int* sumas = (int*)malloc(v * sizeof(int));
@@ -186,10 +186,10 @@ int* sumaDijkstras(int*** arregloDijkstras, int* cuarteles, int c, int v){
 int distanciasIguales(int* arreglo, int v){
 	for (int i = 0; i < v; i++){
 		int x = arreglo[i];
-		if (x == 999){} //ignoramos los cuarteles
+		if (x == 999 || x == 99999){} //ignoramos los cuarteles
 		else{
 			for (int j = i+1; j < v; j++){
-				if (arreglo[j]==999){} //ignoramos los cuarteles			
+				if (arreglo[j]==999 || arreglo[j]==99999){} //ignoramos los cuarteles			
 				else if (x = arreglo[j]){
 					return 1;
 				}
@@ -198,41 +198,70 @@ int distanciasIguales(int* arreglo, int v){
 	}
 	return 0;
 }
-//posCuartelIdeal, función que calcula la posición ideal para el cuartel, en base al arreglo entregado
+//maxDijkstra, función que consigue el max del arreglo distancia de dijkstra para cada vertice
+//DOM: arreglo de arreglos (int***) X arreglo (int*) X int X int
+//REC: arreglo de int (int*)
+int* maxDijkstra(int*** arregloDijkstras, int* cuarteles, int c, int v){
+	int* maximos = (int*)malloc(v * sizeof(int));
+	int x = 0;
+	//Primer ciclo: asigna el máximo de las distancias de cada vertice a la posicion del vertice en "maximos"
+	for(int i = 0; i < v; i++){
+		for(int j = 0; j < v; j++){
+			if (arregloDijkstras[i][0][j] > x) {
+				x = arregloDijkstras[i][0][j];
+			}	
+		}
+		maximos[i] = x;
+	}
+	//Segundo ciclo: agrega "99999" a los cuarteles para que sean ignorados a la hora de buscar minimo, asumiendo que ninguna distancia es mayor a 999999
+	for (int i = 0; i < c; i++){
+		maximos[cuarteles[i]]= 99999; 
+	}
+
+	return maximos;
+	}
+//posCuartelIdeal, función que calcula la posición ideal para el cuartel, en base al minimo de los maximos de las distancias
 //DOM: arreglo de ints (int*)
 //REC: int
-int posCuartelIdeal(int* aSumaDistanciasC, int* aSumaDijkstras, int c, int v){
+int posCuartelIdeal(int*** arregloDijkstras, int* cuarteles, int c, int v){
+	//asignamos arreglos e ints a usar
 	int pos; int x;
-	if (c == 1) { //Si solo hay un cuartel, buscamos la interseccion más lejana al cuartel
-		if (!distanciasIguales(aSumaDijkstras,v)){ //Si no hay distancias iguales, se irá por la interseccion con menor distancia a otras
-			x = aSumaDijkstras[0]; pos = 0;
-			for (size_t i = 0; i < v; i++){
-				if (x > aSumaDijkstras[i]){
-					x = aSumaDijkstras[i];
+	int* sumaDCuarteles = sumaDijkstrasCuarteles(arregloDijkstras,cuarteles,c,v);
+	int* sumaDs = sumaDijkstras(arregloDijkstras,cuarteles,c,v);
+	int* maximos = maxDijkstra(arregloDijkstras,cuarteles,c,v);
+	if (!distanciasIguales(maximos,v)) { //Si no hay distancias iguales: Se elige el que tenga menor distancia a las demás
+		x = maximos[0]; pos = 0;
+			for(int i = 1; i < v; i++){	
+				if (x > maximos[i]) {
+					x = maximos[i];
+					pos = i;
+				}
+			}
+	}
+	else { //Sino: se elige el que tenga mayor distancia al cuartel.
+		//Si solo hay un cuartel:
+		if (c == 1) {
+			x = sumaDCuarteles[0]; pos = 0;
+			for(int i = 1; i < v; i++){	
+				if (x < sumaDCuarteles[i]) {
+					x = sumaDCuarteles[i];
 					pos = i;
 				}
 			}
 		}
-		else { //Si hay distancias iguales, se irá por quien tenga mayor distancia al cuartel
-			x = aSumaDistanciasC[0]; pos = 0;
-			for (size_t i = 0; i < v; i++){
-				if (x < aSumaDistanciasC[i]){
-					x = aSumaDistanciasC[i];
+		//Si hay mas de un cuartel:
+		else if (c > 1) {
+			x = sumaDs[0]; pos = 0;
+			for(int i = 1; i < v; i++){	
+				if (x > sumaDs[i]) {
+					x = sumaDs[i];
 					pos = i;
 				}
-			}			
-		}
-		
-	}
-	else { //Si hay más de un cuartel, se irá por quien tenga la menor suma de distancias de dijkstra 
-		x = aSumaDijkstras[0]; pos = 0;
-		for (size_t i = 0; i < v; i++){
-			if (x > aSumaDijkstras[i]){
-				x = aSumaDijkstras[i];
-				pos = i;
 			}
 		}
 	}
+	printf("El arreglo con los maximos de cada dijkstra:\n");
+	imprimirArreglo(maximos,v); printf("\n");
 	return pos;
 }
 
@@ -267,6 +296,6 @@ int main(int argc, char const *argv[]){
 	printf("El arreglo con la suma de las distancias de un vertice a los otros es:\n");
 	imprimirArreglo(sumas,v); printf("\n");
 	//Con la suma de los algoritmos, encontraremos donde construir un cuartel
-	int posicionIdeal = posCuartelIdeal(sumaDistanciasCuarteles, sumas, c, v);
+	int posicionIdeal = posCuartelIdeal(arregloDijkstras, cuarteles, c, v);
 	printf("Posicion ideal = %d\n",posicionIdeal+1);
 }
