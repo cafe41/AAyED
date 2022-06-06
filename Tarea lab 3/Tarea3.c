@@ -229,32 +229,54 @@ int posCuartelIdeal(int*** arregloDijkstras, int* cuarteles, int c, int v){
 	int* sumaDCuarteles = sumaDijkstrasCuarteles(arregloDijkstras,cuarteles,c,v);
 	int* sumaDs = sumaDijkstras(arregloDijkstras,cuarteles,c,v);
 	int* maximos = maxDijkstra(arregloDijkstras,cuarteles,c,v);
-	if (!distanciasIguales(maximos,v)) { //Si no hay distancias iguales: Se elige el que tenga menor distancia a las demás
-		x = maximos[0]; pos = 0;
-			for(int i = 1; i < v; i++){	
-				if (x > maximos[i]) {
-					x = maximos[i];
-					pos = i;
-				}
-			}
-	}
-	else { //Sino: se elige el que tenga mayor distancia al cuartel.
-		//Si solo hay un cuartel:
-		if (c == 1) {
-			x = sumaDCuarteles[0]; pos = 0;
-			for(int i = 1; i < v; i++){	
-				if (x < sumaDCuarteles[i]) {
-					x = sumaDCuarteles[i];
-					pos = i;
-				}
-			}
+	 //Si no hay distancias iguales: Se elige el que tenga menor distancia a las demás
+	x = maximos[0]; pos = 0;
+	for(int i = 1; i < v; i++){	
+		if (x > maximos[i]) {
+			x = maximos[i];
+			pos = i;
 		}
-		//Si hay mas de un cuartel:
-		else if (c > 1) {
-			x = sumaDs[0]; pos = 0;
+	}
+	if (distanciasIguales(maximos,v)) { //En caso de que hayan distancias de dijkstra iguales:
+		if (c == 1) { //Si solo hay un cuartel:
+			int y = sumaDCuarteles[0];
+			int* comparador = calloc(v,sizeof(int));
+			//Primer ciclo, detecta el mayor valor dentro del arreglo de la suma dijkstra de los cuarteles
 			for(int i = 1; i < v; i++){	
-				if (x > sumaDs[i]) {
-					x = sumaDs[i];
+				if (y < sumaDCuarteles[i]) {
+					y = sumaDCuarteles[i];
+				}
+			}
+			//Segundo ciclo, asigna los valores de la mayor distancia a los cuarteles al arreglo comparador
+			for (int i = 0; i < v; i++){
+				if (sumaDCuarteles[i] == y){
+					comparador[i] = y;
+				}
+			}
+			//Tercer ciclo, revisa opciones "viables" al comparar ambos arreglos
+			for (int i = 0; i < v; i++){
+				if (comparador[i] != 0){
+					if (maximos[i] == x){
+						pos = i; //Finalmente, asigna la posicion a ese espacio
+					}
+				}
+			}
+			
+		}
+		else if (c > 1) {//Si hay mas de un cuartel: 
+		//asigna la "posicion" al intervalo que tenga menos distancia comparado a los otros
+			int y = sumaDs[0];
+			int* comparador = calloc(v,sizeof(int));
+			//Primer ciclo, asigna "y" a donde va el minimo de los maximos (asumiendo que son más de 1)
+			for (int i = 0; i < v; i++){
+				if (x == maximos[i]){
+					comparador[i] = x;
+				}
+			}
+			//Segundo ciclo, asigna el menor valor del arreglo a "y" en base a los minimos de los maximos
+			for(int i = 1; i < v; i++){	
+				if (comparador[i] == x && y > sumaDs[i]) {
+					y = sumaDs[i];
 					pos = i;
 				}
 			}
@@ -264,16 +286,23 @@ int posCuartelIdeal(int*** arregloDijkstras, int* cuarteles, int c, int v){
 	imprimirArreglo(maximos,v); printf("\n");
 	return pos;
 }
-
+//escribirPosicion, función que escribe la posicionIdeal + 1 en el archivoSalida.out
+//DOM: arreglo de char (nombreArchivo) X int
+//REC: void (aunque crea y escribe dentro del archivo de salida)
+void escribirPosicion(const char* archivoSalida, int posicion ){
+	FILE* archivo = fopen(archivoSalida, "w");
+	fprintf(archivo,"%d",posicion+1);
+	fclose(archivo);
+}
 //BLOQUE PRINCIPAL
-int main(int argc, char const *argv[]){
+void main(int argc, char const *argv[]){
     //Declaramos los argumentos como archivo de entrada y salida
     archivoEntrada = argv[1];
     if (argc < 3){printf("\nDebe especificar un archivo de Entrada y otro de Salida.\n");}
     archivoSalida = argv[2];
 	//Corremos el algoritmo que consigue la cantidad de vértices, para correr los otros
 	if (archivoEntrada != NULL) { printf("\nEl grafo y sus datos son:\n"); }
-	//Leemos los datos del archivo y los asignamos a variables
+	//Leemos los datos del archivo y los asignamos a variables, para luego liberar "datos"
 	int* datos = leerDatos(archivoEntrada);
 	int c = datos[0]; int i = datos[1]; int v = datos[2]; free(datos);
 	if (archivoEntrada != NULL) { printf("vertices = %d, ", v); }
@@ -285,17 +314,12 @@ int main(int argc, char const *argv[]){
     if (archivoEntrada != NULL) { printf("Las posiciones de los cuarteles son:\n"); }
 	imprimirArreglo(cuarteles, c); printf("\n");
 	//Creamos un "mega-arreglo" con los arreglos de dijkstra para cada vertice
-	printf("El dijkstra-distancia para cada vertice es:\n");
+	printf("El arreglo dijkstra-distancia para cada vertice es:\n");
 	int*** arregloDijkstras = cicloDijkstra(grafo); printf("\n");
-	//Sumamos los arreglos de distancia de dijstra, de cada arreglo en uno solo
-	int* sumaDistanciasCuarteles = sumaDijkstrasCuarteles(arregloDijkstras, cuarteles, c, v);
-	printf("El arreglo con la suma de las distancias de los cuarteles es:\n");
-	imprimirArreglo(sumaDistanciasCuarteles,v); printf("\n");
-	//test
-	int* sumas = sumaDijkstras(arregloDijkstras, cuarteles, c, v);
-	printf("El arreglo con la suma de las distancias de un vertice a los otros es:\n");
-	imprimirArreglo(sumas,v); printf("\n");
 	//Con la suma de los algoritmos, encontraremos donde construir un cuartel
 	int posicionIdeal = posCuartelIdeal(arregloDijkstras, cuarteles, c, v);
-	printf("Posicion ideal = %d\n",posicionIdeal+1);
+	printf("Posicion ideal = %d (%d en C)\n",posicionIdeal+1, posicionIdeal);
+	//Finalmente, escribimos la posicion y liberamos memoria
+	escribirPosicion(archivoSalida,posicionIdeal);
+	free(arregloDijkstras); free(grafo); free(cuarteles);
 }
