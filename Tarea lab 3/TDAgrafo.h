@@ -41,13 +41,24 @@
 
 	void imprimirMatrizAdyacencia(TDAgrafo* grafo) {
 		int i, j;
-		
+
 		for (i = 0; i < grafo->cvertices; i++) 
 		{
-			printf("%d | ", i);
-			for (j = 0; j < grafo->cvertices; j++) 
-			{
-				printf("%d ", grafo->adyacencias[i][j]);
+			printf("%d", i);
+			for (size_t z = 10; z < 1000; z = z * 10){
+				if (!(i / z != 0)){
+					printf(" ");
+				} 
+			}
+			printf("| ");
+
+			for (j = 0; j < grafo->cvertices; j++){
+				printf("%d", grafo->adyacencias[i][j]);
+				for (size_t x = 10; x < 1000; x = x * 10){
+					if (!(grafo->adyacencias[i][j] / x != 0)){
+						printf(" ");
+					}
+				}
 			}
 			printf("\n");
 		}
@@ -61,7 +72,6 @@
 		}
 		return 0;
 	}
-
 
 	//NoDirigido NoPonderado
 	TDAgrafo* leerGrafoNoDirigido(char *nombreArchivo){
@@ -114,19 +124,19 @@
 	}
 
 	//Funciones extra y propias
-	//imprimirArreglo, función que imprime un arreglo
-	//DOM: arreglo X int (largo del arreglo (n))
-	//REC: print del arreglo
+	//imprimirArreglo, función que imprime un arreglo de ints
+	//DOM: arreglo (int*)
+	//REC: print del arreglo por consola (void)
 	void imprimirArreglo(int* arreglo, int n){
 		for(size_t i = 0; i < n; i++){
 			if (n==1) {
-				printf("(%d)\n", arreglo[i]);
+				printf("[%d]\n", arreglo[i]);
 			}
 			else if (i==0) {
-				printf("(%d, ", arreglo[i]);
+				printf("[%d, ", arreglo[i]);
 			}
 			else if (i==n-1){
-				printf("%d) \n", arreglo[i]);
+				printf("%d]\n", arreglo[i]);
 			}
 			else {
 			printf("%d, ", arreglo[i]);
@@ -379,7 +389,7 @@
 			}	
 		}
 		//Imprimimos los arreglos resultantes:
-		printf("\nDistancia : ");imprimirArreglo(dDistancia,grafo->cvertices);
-		printf("Padres : ");imprimirArreglo(dPadre,grafo->cvertices);
-		printf("Visitados : ");imprimirArreglo(dVisitado,grafo->cvertices);
+		//printf("\nDistancia : ");imprimirArreglo(dDistancia);
+		//printf("Padres : ");imprimirArreglo(dPadre);
+		//printf("Visitados : ");imprimirArreglo(dVisitado);
 	}
