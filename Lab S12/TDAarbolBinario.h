@@ -154,6 +154,9 @@ void recorridoPostordenAB(TDAarbolBinario* arbol){
 /*--------------- operaciones auxiliares -----------------*/
 
 /*---- actividad 3 ----*/
+//contarHojasAB, función que de forma recursiva cuenta las hojas dentro de un arbol
+//DOM: nodoAN X int
+//REC: int
 int contarHojasAB(nodoArbolBinario* nodo, int contador){
   if (nodo!=NULL) {
     if(esHojaAB(nodo)){
@@ -168,6 +171,9 @@ int contarHojasAB(nodoArbolBinario* nodo, int contador){
   }
 }
 
+//numHojasAB, función que "encapsula" a la función contarHojas, no la llama si el arbol es vacío.
+//DOM: TDAarbol
+//REC: int
 int numHojasAB(TDAarbolBinario* arbol){
   int contador = 0;
   if (!esArbolBinarioVacio(arbol)) {
@@ -275,55 +281,45 @@ void insertarNodoAB(TDAarbolBinario* arbol, int padre, int dato, int tipoHijo)
 }
 
 /*----- actividad 4 ----*/
-nodoArbolBinario* buscarPadreRecursivo(nodoArbolBinario* nodo, int dato){nodoArbolBinario* aux;
-  nodoArbolBinario* aux;
-  nodoArbolBinario* aux2;
-  if (nodo!=NULL){
-    if (nodo->dato==dato)
-      return nodo;
-    else {
-      aux = buscarPadreRecursivo(nodo->hijoIzquierdo,dato);
-      if (aux->dato==dato) {
-        aux2 = buscarPadreRecursivo(nodo->hijoIzquierdo,dato);
-        return aux2;
-      }
-      if (aux!=NULL){
-        return aux;
-      }
-      return buscarPadreRecursivo(nodo->hijoDerecho,dato);
-    }
-  }
-}
-
-nodoArbolBinario* buscarPadreAB(TDAarbolBinario* arbol, int dato){
-  nodoArbolBinario* aux;
-  if (!esArbolBinarioVacio(arbol))
-  {
-    aux=arbol->inicio;
-    return buscarPadreRecursivo(aux,dato);
-  }
-  else
-    printf("arbol vacio\n");
-    return NULL;
-}
-/*
+//eliminarNodoAB, función que borra un nodo con el dato que se especifique, 
+//en caso de que sea una hoja se borrará directamente, sino, si tiene un hijo, se le asignará al "abuelo"
+//en caso de que el nodoDato (hijo de nodoPadre), tenga dos hijos, no se podrá asignar al "abuelo".
+//DOM: TDAarbol X int
+//REC: VOID
 void eliminarNodoAB(TDAarbolBinario* arbol, int dato){
-  nodoArbolBinario* nodoPadre;
-  nodoPadre; 
   nodoArbolBinario* nodoDato = buscarNodoAB(arbol, dato);
+  nodoArbolBinario* nodoPadre = nodoDato->padre;
 
-    if (esHojaAB(nodoPadre)) {
-      if (nodoPadre->hijoIzquierdo->dato == dato) {
-        nodoPadre->hijoIzquierdo = NULL;
+  //Primer caso: El nodo a eliminar es una "hoja".
+  if (esHojaAB(nodoDato)) {
+    if (nodoPadre->hijoIzquierdo->dato == dato) {
+      nodoPadre->hijoIzquierdo = NULL;
+    }
+    else if (nodoPadre->hijoDerecho->dato == dato) {
+      nodoPadre->hijoDerecho = NULL;
+    }
+    free(nodoDato); //Liberamos nodoDato, ya que no está "atado" a nada
+  }
+  //Segundo caso: El nodo no es hoja y tiene SOLO UN hijo, por lo que es posible eliminarlo.
+  else if (nodoDato->hijoIzquierdo == NULL || nodoDato->hijoDerecho == NULL) {
+    if (nodoPadre->hijoIzquierdo == nodoDato){ //Caso nodoDato sea hijo izquierdo
+      if (nodoDato->hijoDerecho != NULL){
+        nodoPadre->hijoIzquierdo = nodoDato->hijoDerecho;
       }
-      else if (nodoPadre->hijoDerecho->dato == dato) {
-        nodoPadre->hijoDerecho = NULL;
+      else if (nodoDato->hijoIzquierdo != NULL){
+        nodoPadre->hijoIzquierdo = nodoDato->hijoIzquierdo;
       }
     }
-
-    else {
-      
+    else if (nodoPadre->hijoDerecho == nodoDato){ //Caso nodoDato sea hizo derecho
+      if (nodoDato->hijoDerecho != NULL){
+        nodoPadre->hijoDerecho = nodoDato->hijoDerecho;
+      }
+      else if (nodoDato->hijoIzquierdo != NULL){
+        nodoPadre->hijoDerecho = nodoDato->hijoIzquierdo;
+      }
     }
-
-    free(nodoPadre);*/
-
+    free(nodoDato); //Liberamos nodoDato, ya que no está "atado" a nada
+  }
+  //Tercer caso: El nodo no es hoja y tiene dos hijos, no se puede eliminar.
+  else { printf("No se puede eliminar el nodo del dato: %d\n", dato); }
+}

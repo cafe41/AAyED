@@ -1,0 +1,96 @@
+leerDatos(Arreglo(char) nombreArchivo): Arreglo(num)
+    FILE pf <- fopen(nombreArchivo,"r") ...fopen es una función para abrir archivos en C, en este caso se usa "r", que es para leer el archivo. 
+    num c, num i, num v
+    num a, num b, num w
+    ...Obtenemos "c" e "i"
+    fscanf(pf, "num num", c, i) ...fscanf lee la linea del archivo y si coincide con los "parametros asignados", los asigna a las variables dadas.
+    ...Seguimos escaneando lineas, para obtener los vértices.
+    num x
+    FOR x<-1 TO c STEP 1
+        fscanf(pf, "num", w)
+    ...Este ciclo simplemente avanza el archivo, ya que se lee de forma unidireccional
+    num k
+    FOR k<-1 TO i STEP 1 ...i = numero de intersecciones
+        fscanf(pf, "num num num",a,b,w)
+        IF (a > v) THEN v <- a
+        IF (b > v) THEN v <- B
+    ...Esto nos dará la cantidad de vértices.
+    ...Metemos todo a un arreglo para retornarlo.
+    Arreglo(num) A
+    A[1]<-c, A[2]<-i, A[3]<-v
+    RETURN (A)
+
+leerPueblo(Arreglo(char) nombreArchivo): Arreglo(num)
+    FILE pf <- fopen(nombreArchivo,"r") ...fopen es una función para abrir archivos en C, en este caso se usa "r", que es para leer el archivo. 
+    num a, num b, num w
+    ...Saltamos una linea (la que contenía a "c" e "i")
+    fscanf(pf)
+    ...Asignamos memoria a un grafo
+    TDAgrafo G
+    ...Seguimos escaneando lineas.
+    num x
+    FOR x<-1 TO c STEP 1
+        fscanf(pf)
+    ...Este ciclo simplemente avanza el archivo, ya que se lee de forma unidireccional
+    num k
+    FOR k<-1 TO i STEP 1 ...i = numero de intersecciones
+        fscanf(pf, "num num num",a,b,w)
+        G->A[a-1][b-1]<- w
+        G->A[b-1][a-1]<- w
+        IF (b > v) THEN v <- B
+    ...Esto generará el grafo con sus respectivos pesos
+    RETURN (G)
+
+leerCuarteles(Arreglo(char) nombreArchivo): Arreglo(num)
+    FILE pf <- fopen(nombreArchivo,"r") ...fopen es una función para abrir archivos en C, en este caso se usa "r", que es para leer el archivo. 
+    ...Saltamos una linea (la que contenía a "c" e "i")
+    fscanf(pf)
+    ...Asignamos memoria a un arreglo
+    Arreglo(num) A
+    ...Escaneamos lineas y las asignamos a las posiciones del arreglo.
+    num x
+    FOR x<-1 TO c STEP 1
+        fscanf(pf, "num", A[x])
+    RETURN (A)
+
+cicloDijkstra(TDAgrafo G): arreglo(arreglo(arreglo(num)))
+    arreglo*** Dijkstras
+    num i, num j
+    FOR i<-1 TO G->V STEP 1
+        dijkstra(G,i) ...aplicamos dijkstra al vertice "i"
+        FOR j<-1 TO 3
+            IF (j = 1) THEN
+                Dijkstras[i][j]<-DijkstraDistancia 
+                ...resultado "global" de la función dijkstra llamada anteriormente
+            ELSE IF (j = 2) THEN
+                Dijkstras[i][j]<-DijkstraPadre
+            ELSE IF (j = 3) THEN
+                Dijkstras[i][j]<-DijkstraVisitados
+    RETURN Dijkstras
+
+maxDijkstra( arreglo(arreglo(arreglo(num)))arregloDijkstras, arreglo(num) cuarteles, num c, num v): arreglo(num)
+    arreglo(num) maximos
+    num x<-0
+    num i, num j
+    ...Asignamos las distancias maximas
+    FOR i<-0 TO v STEP 1
+        FOR j<-0 TO v STEP 1
+            IF (arregloDijkstras[i][0][j] > x) THEN
+                x<- arregloDijkstras[i][0][j]
+        maximos[i]<- x ...asigna el maximo del vector a la posicion del vector        
+    FOR i<-0 TO c STEP 1
+        maximos[cuarteles[i]]<-99999
+        ...asigna 99999 a la posicion del cuartel, así al buscar el mínimo no encuentra un cuartel.
+    RETURN maximos
+
+...Este pseudo-código lo escribí sin los "filtros extra"
+posCuartelIdeal( arreglo(arreglo(arreglo(num)))arregloDijkstras, arreglo(num) cuarteles, num c, num v): num
+    num pos, num x
+    arreglo(num) maximos <- maxDijkstra(arregloDijkstras,cuarteles,c,v)
+    x<-maximos[1]
+    pos<-1
+    FOR i<-2 TO v STEP 1
+        IF x > maximos[i] ...busca el mínimo entre máximos
+            x<- maximos[i]
+            pos<-i
+    RETURN (pos)

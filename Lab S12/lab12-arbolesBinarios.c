@@ -4,7 +4,7 @@
 
 int main() 
 {	
-	//Se crea un TDAarbol, llamado "arbolBinario"
+	//Se crea un TDAarbol, llamado "arbolBinario" y le agregamos nodos.
 	TDAarbolBinario* arbolBinario=crearArbolBinarioVacio();
 	insertarNodoAB(arbolBinario,0,9,0);
 	insertarNodoAB(arbolBinario,9,1,0);
@@ -21,8 +21,16 @@ int main()
 	printf("Post-Orden: ["); recorridoPostordenAB(arbolBinario); printf("]\n");
 	//Calculamos el número de hojas con la función "numHojasAB":
 	printf("Cantidad de hojas: "); numHojasAB(arbolBinario); printf("\n");
-	//
-	printf("Padre: %d Nodo: %d\n",buscarPadreAB(arbolBinario,2)->dato,buscarNodoAB(arbolBinario,2)->dato);
-	
+	//Eliminamos los nodos 4, 5 y 9
+	//Primero el 4:
+	eliminarNodoAB(arbolBinario,4);
+	printf("In-Orden luego de eliminar 4: ["); recorridoInordenAB(arbolBinario); printf("]\n");
+	//Luego el 5: 
+	eliminarNodoAB(arbolBinario,5);
+	printf("In-Orden luego de eliminar 5: ["); recorridoInordenAB(arbolBinario); printf("]\n");
+	//Luego el 9:
+	eliminarNodoAB(arbolBinario,9);
+	printf("In-Orden luego de eliminar 9: ["); recorridoInordenAB(arbolBinario); printf("]\n");
+	//Fin del programa.
 	return 0;
 }
