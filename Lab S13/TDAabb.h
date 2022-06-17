@@ -100,6 +100,35 @@ void recorridoInordenABB(TDAabb* arbol)
     printf("El árbol binario está vacío\n");
 }
 
+/*--------------- operaciones de búsqueda -----------------*/
+
+/*---- actividad propuesta ----*/
+nodoABB* buscarNodoRecursivoABB(nodoABB* nodo, int dato){
+  nodoABB* aux;
+  if (nodo!=NULL)
+  {
+    if (nodo->dato==dato)
+      return nodo;
+    else
+    {
+      aux=buscarNodoRecursivoABB(nodo->hijoIzquierdo,dato);
+      if (aux!=NULL)
+        return aux;
+      return buscarNodoRecursivoABB(nodo->hijoDerecho,dato);
+    }
+  }
+}
+nodoABB* buscarNodoABB(TDAabb* arbol, int dato){
+  nodoABB* aux;
+  if (!esABBvacio(arbol))
+  {
+    aux=arbol->inicio;
+    return buscarNodoRecursivoABB(aux,dato);
+  }
+  else
+    return NULL;
+}
+
 /*--------------- operaciones auxiliares -----------------*/
 
 nodoABB* buscarMenorABB(TDAabb* arbol, nodoABB* nodo)
@@ -124,16 +153,32 @@ nodoABB* buscarMenorABB(TDAabb* arbol, nodoABB* nodo)
 }
 
 /*---- actividad 1 ----*/
-int verificacionRecursivaABB(TDAarbolBinario* arbol, nodoABB* nodo){
+int verificacionRecursivaABB(TDAabb* arbol, nodoABB* nodo){
   // retorna falso si el de la derecha es menor o si el de la izq es mayor (asumiendo que no son null)
-  
+  if (nodo->hijoIzquierdo != NULL) {
+    if (nodo->hijoIzquierdo->dato < nodo->dato) {
+      verificacionRecursivaABB(arbol, nodo->hijoIzquierdo);
+    }
+    else {
+      return 0;
+    }
+  }
+  if (nodo->hijoDerecho != NULL) {
+    if (nodo->hijoDerecho->dato > nodo->dato) {
+      verificacionRecursivaABB(arbol, nodo->hijoDerecho);
+    }
+    else {
+      return 0;
+    }
+  }
+  return 1;
 }
 
-int verificarABB(TDAarbolBinario* arbol){
+int verificarABB(TDAabb* arbol){
   if (arbol->inicio != NULL){
     verificacionRecursivaABB(arbol, arbol->inicio);
   }
-  else {printf("El arbol esta vacio\n")}
+  else {printf("El arbol esta vacio\n");}
 }
 
 /*--------------- operaciones de actualización -----------------*/
@@ -195,11 +240,49 @@ void insertarNodoABB(TDAabb* arbol, int dato)
 
 
 /*---- actividad 2 ----*/
-void eliminarNodoABB(TDAabb* arbol, int dato);
+void eliminarNodoABB(TDAabb* arbol, int dato){
+  nodoABB* nodoDato = buscarNodoABB(arbol,dato);
+  nodoABB* nodoPadre = nodoDato->padre;
 
-
-/*--------------- operaciones de búsqueda -----------------*/
-
-/*---- actividad propuesta ----*/
-nodoABB* buscarNodoRecursivoABB(nodoABB* nodo, int dato);
-nodoABB* buscarNodoABB(TDAabb* arbol, int dato);
+  //Primer caso: El nodo a eliminar es una "hoja".
+  if (esHojaABB(arbol,nodoDato)) {
+    if (nodoPadre->hijoIzquierdo->dato == dato) {
+      nodoPadre->hijoIzquierdo = NULL;
+    }
+    else if (nodoPadre->hijoDerecho->dato == dato) {
+      nodoPadre->hijoDerecho = NULL;
+    }
+    free(nodoDato); //Liberamos nodoDato, ya que no está "atado" a nada
+  }
+  //Segundo caso: El nodo no es hoja y tiene SOLO UN hijo, por lo que es posible eliminarlo.
+  else if (nodoDato->hijoIzquierdo == NULL || nodoDato->hijoDerecho == NULL) {
+    if (nodoPadre->hijoIzquierdo == nodoDato){ //Caso nodoDato sea hijo izquierdo
+      if (nodoDato->hijoDerecho != NULL){
+        nodoPadre->hijoIzquierdo = nodoDato->hijoDerecho;
+      }
+      else if (nodoDato->hijoIzquierdo != NULL){
+        nodoPadre->hijoIzquierdo = nodoDato->hijoIzquierdo;
+      }
+    }
+    else if (nodoPadre->hijoDerecho == nodoDato){ //Caso nodoDato sea hizo derecho
+      if (nodoDato->hijoDerecho != NULL){
+        nodoPadre->hijoDerecho = nodoDato->hijoDerecho;
+      }
+      else if (nodoDato->hijoIzquierdo != NULL){
+        nodoPadre->hijoDerecho = nodoDato->hijoIzquierdo;
+      }
+    }
+    free(nodoDato); //Liberamos nodoDato, ya que no está "atado" a nada
+  }
+  //Tercer caso: El nodo no es hoja y no se puede eliminar de forma "convencional", 
+  //se llama la función de forma recursiva, intercambiando los datos de los nodos.
+  else {
+    nodoABB* aux1 = buscarMenorABB(arbol, nodoDato->hijoDerecho);
+    //Intercambio
+    int intercambio = nodoDato->dato;
+    nodoDato->dato = aux1->dato;
+    aux1->dato = intercambio;
+    //Llamado recursivo
+    eliminarNodoABB(arbol, aux1->dato);
+  }
+}
