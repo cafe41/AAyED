@@ -107,8 +107,7 @@ void recorridoInorden(nodoAVL* nodo)
   }
 }
 
-void recorridoInordenAVL(TDAarbolAVL* arbol)
-{
+void recorridoInordenAVL(TDAarbolAVL* arbol){
   if (!esAVLvacio(arbol))
   {
     printf("INORDEN: ");
@@ -122,25 +121,42 @@ void recorridoInordenAVL(TDAarbolAVL* arbol)
 /*------------------ operaciones de balance --------------------*/
 
 /***------------- actividad 1 -------------***/
+//largoArbol, función que recorre el arbol hacia atrás, a través de padres, para conseguir la altura
+//DOM: TDAarbolAVL X TDAnodoAVL
+//REC: int
 int largoArbol(TDAarbolAVL* arbol, nodoAVL* nodo){
   if (nodo == NULL) {
     return 0;
   }
   else {
-    
+    return (largoArbol(arbol,nodo->hijoIzquierdo)+largoArbol(arbol,nodo->hijoDerecho)+1);
   }
 }
 
+//recorrerArbolAVL, función que recorre el arbol (desde X nodo) y encuentra el nodo con mayor altura desde el nodo X.
+//DOM: TDAarbolAVL X TDAnodoAVL
+//REC: TDAnodoAVL
+
+//WIP
+nodoAVL* recorrerArbolAVL(TDAarbolAVL* arbol) {
+  
+}
+
+//esBalanceadoNodoAVL, función que retorna 1 si el arbol está balanceado, sino 0
+//DOM: TDAarbolAVL X TDAnodoAVL
+//REC: int (boolean)
 int esBalanceadoNodoAVL(TDAarbolAVL* arbol, nodoAVL* nodo){
   if (!esAVLvacio(arbol)){
     int contador = 0;
     int ladoIzq = largoArbol(arbol, nodo->hijoIzquierdo); //Obtiene la altura del hijo izquierdo
     int ladoDer = largoArbol(arbol, nodo->hijoDerecho);   //Obtiene la altura del hijo derecho
+    printf("ladoDer = %d\nladoIzq = %d\n", ladoDer, ladoIzq);
     if (ladoIzq < ladoDer){
       while(ladoIzq < ladoDer){
         ladoIzq = ladoIzq + 1;
         contador = contador + 1;
       }
+      printf("contador = %d\n",contador);
       if (contador > 1){
         return 0;
       }
@@ -149,9 +165,12 @@ int esBalanceadoNodoAVL(TDAarbolAVL* arbol, nodoAVL* nodo){
       }
     }
     else if (ladoDer < ladoIzq) {
-      ladoDer = ladoDer + 1;
-      contador = contador + 1;
+      while (ladoDer < ladoIzq){
+        ladoDer = ladoDer + 1;
+        contador = contador + 1;
+      }
     }
+    printf("contador = %d\n",contador);
     if (contador > 1){
         return 0;
       }
@@ -162,11 +181,10 @@ int esBalanceadoNodoAVL(TDAarbolAVL* arbol, nodoAVL* nodo){
   else {printf("El arbol esta vacio\n");}
 }
 
-
 /***------------- actividad 2 -------------***/
-void recuperarBalanceAVL(TDAarbolAVL* arbol, nodoAVL* z);
-
-
+void recuperarBalanceAVL(TDAarbolAVL* arbol, nodoAVL* z){
+  
+}
 
 /*--------------- operaciones de búsqueda -----------------*/
 
@@ -260,7 +278,6 @@ void insertarNodoAVL(TDAarbolAVL* arbol, int dato)
 
 /*** -------- actividad 3 ---------- ***/
 void eliminarNodoAVL(TDAarbolAVL* arbol, int dato);
-
 
 
 

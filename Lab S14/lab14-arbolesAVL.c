@@ -15,6 +15,10 @@ int main()
 	recorridoInordenAVL(arbolAVL);
 	insertarNodoAVL(arbolAVL,12);
 	recorridoInordenAVL(arbolAVL);
+
+	int a = esBalanceadoNodoAVL(arbolAVL,arbolAVL->inicio);
+	printf("Es AVL? = %d\n",a);
+
 	return 0;
 }
 
