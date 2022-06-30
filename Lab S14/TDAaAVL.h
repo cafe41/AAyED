@@ -118,6 +118,18 @@ void recorridoInordenAVL(TDAarbolAVL* arbol){
     printf("El árbol AVL está vacío\n");
 }
 
+//imprimirNodo, función que imprime un nodo
+//DOM: TDAnodoAVL
+//REC: void
+void imprimirNodo(nodoAVL* nodo){
+  if (nodo->padre == NULL){printf("nodo padre: es la raiz\n");}
+  else{printf("nodo padre: %d\n",nodo->padre->dato);}
+	printf("nodo: %d\n",nodo->dato);
+	if (nodo->hijoIzquierdo == NULL){printf("hijo izq: %s\n",nodo->hijoIzquierdo);}
+	else{printf("hijo izq: %d\n",nodo->hijoIzquierdo->dato);}
+	if (nodo->hijoDerecho == NULL){printf("hijo der: %s\n",nodo->hijoDerecho);}
+	else{printf("hijo der: %d\n",nodo->hijoDerecho->dato);}
+}
 /*------------------ operaciones de balance --------------------*/
 
 /***------------- actividad 1 -------------***/
@@ -129,17 +141,30 @@ int largoArbol(TDAarbolAVL* arbol, nodoAVL* nodo){
     return 0;
   }
   else {
+    //Caso hoja, no posee hijos
+    if (esHojaAVL(arbol,nodo)) {
+      return 1;
+    }
+    //Caso ambos hijos
+    else if (nodo->hijoIzquierdo != NULL && nodo->hijoDerecho != NULL){
+      if (largoArbol(arbol,nodo->hijoIzquierdo) > largoArbol(arbol,nodo->hijoDerecho)){
+        return (largoArbol(arbol,nodo->hijoIzquierdo) +1);
+      }
+      else{
+        return (largoArbol(arbol,nodo->hijoDerecho) +1);
+      }
+    }
+    //Caso un hijo hacia la izquierda
+    else if (nodo->hijoIzquierdo != NULL){
+      return (largoArbol(arbol,nodo->hijoIzquierdo)+1);
+    }
+    //Caso un hijo hacia la derecha
+    else if (nodo->hijoDerecho != NULL){
+      return (largoArbol(arbol,nodo->hijoDerecho)+1);
+    }
+    
     return (largoArbol(arbol,nodo->hijoIzquierdo)+largoArbol(arbol,nodo->hijoDerecho)+1);
   }
-}
-
-//recorrerArbolAVL, función que recorre el arbol (desde X nodo) y encuentra el nodo con mayor altura desde el nodo X.
-//DOM: TDAarbolAVL X TDAnodoAVL
-//REC: TDAnodoAVL
-
-//WIP
-nodoAVL* recorrerArbolAVL(TDAarbolAVL* arbol) {
-  
 }
 
 //esBalanceadoNodoAVL, función que retorna 1 si el arbol está balanceado, sino 0
@@ -148,20 +173,18 @@ nodoAVL* recorrerArbolAVL(TDAarbolAVL* arbol) {
 int esBalanceadoNodoAVL(TDAarbolAVL* arbol, nodoAVL* nodo){
   if (!esAVLvacio(arbol)){
     int contador = 0;
-    int ladoIzq = largoArbol(arbol, nodo->hijoIzquierdo); //Obtiene la altura del hijo izquierdo
-    int ladoDer = largoArbol(arbol, nodo->hijoDerecho);   //Obtiene la altura del hijo derecho
-    printf("ladoDer = %d\nladoIzq = %d\n", ladoDer, ladoIzq);
+
+    //Obtiene la altura del hijo izquierdo
+    int ladoIzq = largoArbol(arbol, nodo->hijoIzquierdo);
+     
+    //Obtiene la altura del hijo derecho
+    int ladoDer = largoArbol(arbol, nodo->hijoDerecho);   
+    
+    printf("Para el nodo %d:\nladoDer = %d\nladoIzq = %d\n", nodo->dato, ladoDer, ladoIzq);
     if (ladoIzq < ladoDer){
       while(ladoIzq < ladoDer){
         ladoIzq = ladoIzq + 1;
         contador = contador + 1;
-      }
-      printf("contador = %d\n",contador);
-      if (contador > 1){
-        return 0;
-      }
-      else {
-        return 1;
       }
     }
     else if (ladoDer < ladoIzq) {
@@ -170,20 +193,164 @@ int esBalanceadoNodoAVL(TDAarbolAVL* arbol, nodoAVL* nodo){
         contador = contador + 1;
       }
     }
-    printf("contador = %d\n",contador);
-    if (contador > 1){
-        return 0;
-      }
-      else {
+    if (contador == 0){
         return 1;
       }
+    else {
+      return 0;
+    }
   }
   else {printf("El arbol esta vacio\n");}
 }
 
 /***------------- actividad 2 -------------***/
+void movimientosBalanceAVL(TDAarbolAVL* arbol, nodoAVL* z){
+  //Defino estas variables para "limpiar" el código
+  nodoAVL* hijoIzq = z->hijoIzquierdo;
+  nodoAVL* hijoDer = z->hijoDerecho;
+  //Se aplicará una serie de movimientos dependendiendo del desbalance que posea
+  //Caso "L"
+  if (largoArbol(arbol,hijoIzq) > largoArbol(arbol,hijoDer)){
+    //Caso a: "LL"
+    if (largoArbol(arbol,hijoIzq->hijoIzquierdo) > largoArbol(arbol,hijoIzq->hijoDerecho)){
+      printf("Se le aplica un movimiento LL a %d\n",z->dato);
+      //Definimos "x" e "y" + los nodos a intercambiar
+      nodoAVL* y = z->hijoIzquierdo;
+      nodoAVL* x = y->hijoIzquierdo;
+      nodoAVL* t2 = y->hijoDerecho;
+      //En caso de que Z no tenga padre:
+      if (z->padre == NULL){
+        arbol->inicio = y;
+        y->padre = NULL;
+      }
+      else{//Sino, vemos cuál de los dos hijos es:
+        if (z->padre->hijoIzquierdo == z){//caso izq
+          z->padre->hijoIzquierdo = y;
+          y->padre = z->padre;
+        }
+        else if (z->padre->hijoDerecho == z){//caso der
+          z->padre->hijoDerecho = y;
+          y->padre = z->padre;
+        }
+      }
+      y->hijoDerecho = z;
+      if (z != NULL){z->padre = y;}
+      z->hijoIzquierdo = t2;
+      if (t2 != NULL){t2->padre = z;}
+    }
+    //Caso c: "LR"
+    else if (largoArbol(arbol,hijoIzq->hijoIzquierdo) < largoArbol(arbol,hijoIzq->hijoDerecho)
+    || ((largoArbol(arbol,hijoIzq->hijoIzquierdo) == largoArbol(arbol,hijoIzq->hijoDerecho)) 
+    && hijoIzq->hijoIzquierdo != NULL && hijoIzq->hijoDerecho != NULL)){
+      printf("Se le aplica un movimiento LR a %d\n",z->dato);
+      //Definimos "x" e "y" + los nodos a intercambiar
+      nodoAVL* y = z->hijoIzquierdo;
+      nodoAVL* x = y->hijoDerecho;
+      nodoAVL* t1 = x->hijoIzquierdo;
+      nodoAVL* t2 = x->hijoDerecho;
+      //En caso de que Z no tenga padre:
+      if (z->padre == NULL){
+        arbol->inicio = x;
+        x->padre = NULL;
+      }
+      else{//Sino, vemos cuál de los dos hijos es:
+        if (z->padre->hijoIzquierdo == z){//caso izq
+          z->padre->hijoIzquierdo = x;
+          x->padre = z->padre;
+        }
+        else if (z->padre->hijoDerecho == z){//caso der
+          z->padre->hijoDerecho = x;
+          x->padre = z->padre;
+        }
+      }
+      x->hijoIzquierdo = y;
+      if (y != NULL){y->padre = x;}
+      x->hijoDerecho = z;
+      if (z != NULL){z->padre = x;}
+      y->hijoDerecho = t1;
+      if (t1 != NULL){t1->padre = y;}
+      z->hijoIzquierdo = t2;
+      if (t2 != NULL){t2->padre = z;}
+    }
+  }
+  //Caso "R"
+  else if(largoArbol(arbol,hijoIzq) < largoArbol(arbol,hijoDer)){
+    //Caso b: "RR"
+    if (largoArbol(arbol,hijoDer->hijoIzquierdo) < largoArbol(arbol,hijoDer->hijoDerecho)){
+      printf("Se le aplica un movimiento RR a %d\n",z->dato);
+      //Definimos "x" e "y" + los nodos a intercambiar
+      nodoAVL* y = z->hijoDerecho;
+      nodoAVL* x = y->hijoDerecho;
+      nodoAVL* t1 = y->hijoIzquierdo;
+      //En caso de que Z no tenga padre:
+      if (z->padre == NULL){
+        arbol->inicio = y;
+        y->padre = NULL;
+      }
+      else{//Sino, vemos cuál de los dos hijos es:
+        if (z->padre->hijoIzquierdo == z){//caso izq
+          z->padre->hijoIzquierdo = y;
+          y->padre = z->padre;
+        }
+        else if (z->padre->hijoDerecho == z){//caso der
+          z->padre->hijoDerecho = y;
+          y->padre = z->padre;
+        }
+      }
+      y->hijoIzquierdo = z;
+      if (z != NULL){z->padre = y;}
+      z->hijoDerecho = t1;
+      if (t1 != NULL){t1->padre = z;}
+    }
+    //Caso d: "RL"
+    else if (largoArbol(arbol,hijoDer->hijoIzquierdo) > largoArbol(arbol,hijoDer->hijoDerecho)
+    || ((largoArbol(arbol,hijoDer->hijoIzquierdo) == largoArbol(arbol,hijoDer->hijoDerecho)) 
+    && hijoDer->hijoIzquierdo != NULL && hijoDer->hijoDerecho != NULL)){
+      printf("Se le aplica un movimiento RL a %d\n",z->dato);
+      //Definimos "x" e "y" + los nodos a intercambiar
+      nodoAVL* y = z->hijoDerecho;
+      nodoAVL* x = y->hijoIzquierdo;
+      nodoAVL* t1 = x->hijoIzquierdo;
+      nodoAVL* t2 = x->hijoDerecho;
+      //En caso de que Z no tenga padre:
+      if (z->padre == NULL){
+        arbol->inicio = x;
+        x->padre = NULL;
+      }
+      else{//Sino, vemos cuál de los dos hijos es:
+        if (z->padre->hijoIzquierdo == z){//caso izq
+          z->padre->hijoIzquierdo = x;
+          x->padre = z->padre;
+        }
+        else if (z->padre->hijoDerecho == z){//caso der
+          z->padre->hijoDerecho = x;
+          x->padre = z->padre;
+        }
+      }
+      x->hijoIzquierdo = z;
+      if (z != NULL){z->padre = x;}
+      x->hijoDerecho = y;
+      if (y != NULL){y->padre = x;}
+      z->hijoDerecho = t1;
+      if (t1 != NULL){t1->padre = z;}
+      y->hijoIzquierdo = t2;
+      if (t2 != NULL){t2->padre = y;}
+    }
+  }
+}
+
 void recuperarBalanceAVL(TDAarbolAVL* arbol, nodoAVL* z){
-  
+  while (z != NULL) {
+    nodoAVL* zHI = z->hijoIzquierdo;
+    nodoAVL* zHD = z->hijoDerecho;
+    imprimirNodo(z);printf("\n");
+    movimientosBalanceAVL(arbol,z);
+    //Para evitar los ciclos infinitos
+    if (z->padre == zHI || z->padre == zHD){
+      z = z->padre->padre;
+    }
+    else {z = z->padre;}
+  }
 }
 
 /*--------------- operaciones de búsqueda -----------------*/
@@ -278,9 +445,3 @@ void insertarNodoAVL(TDAarbolAVL* arbol, int dato)
 
 /*** -------- actividad 3 ---------- ***/
 void eliminarNodoAVL(TDAarbolAVL* arbol, int dato);
-
-
-
-
-
-
