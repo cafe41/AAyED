@@ -37,10 +37,13 @@ int main() {
 
 	//Balanceos
 	while (esBalanceadoNodoAVL(arbolAVL,arbolAVL->inicio) != 1){//Mientras el arbolAVL no esté balanceado:
-		recuperarBalanceAVL(arbolAVL,arbolAVL->inicio->hijoIzquierdo->hijoDerecho->
-		hijoDerecho->hijoIzquierdo); //Recorrerá hasta el nodo más bajo (caso específico)
+		//nodoMenorAlturaAVL recorrerá hasta el nodo más bajo, para ejecutar "recuperarBalance"
+		recuperarBalanceAVL(arbolAVL,nodoMenorAlturaAVL(arbolAVL)); 
+		if (largoArbol(arbolAVL,arbolAVL->inicio->hijoIzquierdo) == 
+			largoArbol(arbolAVL,arbolAVL->inicio->hijoDerecho)){
+			printf("El arbol esta balanceado\n");
+		}
 	}
-	printf("El arbol esta balanceado\n");
 	
 	printf("\n");recorridoInordenAVL(arbolAVL);
 

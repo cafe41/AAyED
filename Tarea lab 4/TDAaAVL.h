@@ -181,7 +181,6 @@ int esBalanceadoNodoAVL(TDAarbolAVL* arbol, nodoAVL* nodo){
     //Obtiene la altura del hijo derecho
     int ladoDer = largoArbol(arbol, nodo->hijoDerecho);   
     
-    printf("Para el nodo %d:\nh ladoDer = %d\nh ladoIzq = %d\n", nodo->dato, ladoDer, ladoIzq);
     if (ladoIzq < ladoDer){
       while(ladoIzq < ladoDer){
         ladoIzq = ladoIzq + 1;
@@ -202,6 +201,29 @@ int esBalanceadoNodoAVL(TDAarbolAVL* arbol, nodoAVL* nodo){
     }
   }
   else {printf("El arbol esta vacio\n");}
+}
+
+/***------------- función extra -------------***/
+//nodoMenorAlturaAVL, función que busca el nodo con menor altura dentro del arbol
+//DOM: TDAarbolAVL
+//REC: TDAnodoAVL
+nodoAVL* nodoMenorAlturaAVL(TDAarbolAVL* arbol){
+  nodoAVL* aux;
+  if (!esAVLvacio(arbol)){
+    aux = arbol->inicio;
+    //Va viendo la altura de cada lado y se va por el lado más alto, hasta llegar a una hoja
+    while (!esHojaAVL(arbol,aux)){
+      if (largoArbol(arbol,aux->hijoIzquierdo) > largoArbol(arbol,aux->hijoDerecho)){
+        aux = aux->hijoIzquierdo;
+      }
+      else if (largoArbol(arbol,aux->hijoIzquierdo) < largoArbol(arbol,aux->hijoDerecho)){
+        aux = aux->hijoDerecho;
+      }
+    }
+  }
+  else{printf("El arbol esta vacio");}
+  
+  return aux;
 }
 
 /***------------- actividad 2 -------------***/
@@ -347,16 +369,21 @@ void movimientosBalanceAVL(TDAarbolAVL* arbol, nodoAVL* z){
 //DOM: TDAarbolAVL X TDAnodoAVL
 //REC: void
 void recuperarBalanceAVL(TDAarbolAVL* arbol, nodoAVL* z){
-  while (z != NULL) {
-    nodoAVL* zHI = z->hijoIzquierdo;
-    nodoAVL* zHD = z->hijoDerecho;
-    imprimirNodo(z);printf("\n");
-    movimientosBalanceAVL(arbol,z);
-    //Para evitar los ciclos infinitos
-    if (z->padre == zHI || z->padre == zHD){
-      z = z->padre->padre;
+  while (esBalanceadoNodoAVL(arbol,arbol->inicio) != 1){  
+    while (z != NULL) {
+      nodoAVL* zHI = z->hijoIzquierdo;
+      nodoAVL* zHD = z->hijoDerecho;
+      
+      movimientosBalanceAVL(arbol,z);
+      //Para evitar los ciclos infinitos
+      if (z->padre == zHI || z->padre == zHD){
+        z = z->padre->padre;
+      }
+      else {z = z->padre;}
     }
-    else {z = z->padre;}
+    if (esBalanceadoNodoAVL(arbol, arbol->inicio) == 1)
+		{printf("El arbol esta balanceado\n");} printf("\n");
+    z = nodoMenorAlturaAVL(arbol);
   }
 }
 
@@ -452,27 +479,3 @@ void insertarNodoAVL(TDAarbolAVL* arbol, int dato)
 
 /*** -------- actividad 3 ---------- ***/
 void eliminarNodoAVL(TDAarbolAVL* arbol, int dato);
-
-/*** -------- funciones extra -------- ***/
-
-//nodoMenorAlturaAVL, función que busca el nodo con menor altura dentro del arbol
-//DOM: TDAarbolAVL
-//REC: TDAnodoAVL
-nodoAVL* nodoMenorAlturaAVL(TDAarbolAVL* arbol){
-  nodoAVL* aux;
-  if (!esAVLvacio(arbol)){
-    aux = arbol->inicio;
-    //Va viendo la altura de cada lado y se va por el lado más alto, hasta llegar a una hoja
-    while (!esHojaAVL(arbol,aux)){
-      if (largoArbol(arbol,aux->hijoIzquierdo) > largoArbol(arbol,aux->hijoDerecho)){
-        aux = aux->hijoIzquierdo;
-      }
-      else if (largoArbol(arbol,aux->hijoIzquierdo) < largoArbol(arbol,aux->hijoDerecho)){
-        aux = aux->hijoDerecho;
-      }
-    }
-  }
-  else{printf("El arbol esta vacio");}
-  
-  return aux;
-}
