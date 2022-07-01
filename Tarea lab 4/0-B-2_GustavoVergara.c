@@ -58,6 +58,10 @@ TDAarbolAVL* listaToAVL(TDAlista* listaE){
 //transformarAVL, función que transforma la información del AVL a una lista.
 //DOM: TDAarbolAVL X TDAnodoAVL X TDAlista X int X int
 //REC: void
+
+//AGREGAR NODOS A UNA LISTA
+//Si el d1 del siguiente nodo es menor al d2 del nodo anterior,
+//Se borra el nodo nuevo y se edita el d2 del nodo anterior
 void transformarAVL(TDAarbolAVL* arbol, nodoAVL* nodo, TDAlista* listaSalida ,int x1, int x2){
 	if (nodo!=NULL){
 		int d1 = nodo->dato /100;
