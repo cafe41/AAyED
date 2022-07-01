@@ -193,7 +193,7 @@ int esBalanceadoNodoAVL(TDAarbolAVL* arbol, nodoAVL* nodo){
         contador = contador + 1;
       }
     }
-    if (contador <= 1){
+    if (contador == 1){
         return 1;
       }
     else {

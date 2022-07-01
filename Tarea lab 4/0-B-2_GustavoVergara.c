@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include "TDAaAVL.h" //TDAaAVL y TDAlista están editados para tener un nodo con dos datos
-#include "TDAlista.h"//De esta forma, serán usados en la tarea 4.
+#include "TDAaAVL.h" 
+#include "TDAlista.h" //TDAlista está editado para tener un nodo con dos datos
 
 //Variables Globales
 
@@ -58,28 +58,40 @@ TDAarbolAVL* listaToAVL(TDAlista* listaE){
 //transformarAVL, función que transforma la información del AVL a una lista.
 //DOM: TDAarbolAVL X TDAnodoAVL X TDAlista X int X int
 //REC: void
-
-//AGREGAR NODOS A UNA LISTA
-//Si el d1 del siguiente nodo es menor al d2 del nodo anterior,
-//Se borra el nodo nuevo y se edita el d2 del nodo anterior
-void transformarAVL(TDAarbolAVL* arbol, nodoAVL* nodo, TDAlista* listaSalida ,int x1, int x2){
-	if (nodo!=NULL){
-		int d1 = nodo->dato /100;
-		int d2 = nodo->dato %100;
-		//Llamado recursivo hijo izq
-		transformarAVL(arbol,nodo->hijoIzquierdo,listaSalida,x1,x2);
-		//
-		if(x1==0){x1 = d1;} //Esto impide que se escriban horarios
-		if (x2 < d1){
-			//Cortamos x2 => [x1,x2]
-			//Insertamos el nodo "creado" al inicio
-			if (listaSalida->inicio == NULL){insertarInicio(listaSalida,x1,x2);}
-			else{insertarNodoFinal(listaSalida,x1,x2);}
-			x1 = 0;
+void transformarAVL(TDAarbolAVL* arbol, nodoAVL* nodoA, TDAlista* listaSalida){
+	if (nodoA!=NULL){//nodoA = nodoArbolAVL
+		//Creamos un nodo auxiliar que llegue al final de la lista
+		nodo* auxiliar = listaSalida->inicio;
+		if (auxiliar != NULL){
+			while (auxiliar->siguiente!=NULL){
+			auxiliar = auxiliar->siguiente;
+			}
 		}
-		if (x2 < d2){x2 = d2;}
-		//Llamado recursivo caso hijo der
-		transformarAVL(arbol,nodo->hijoDerecho,listaSalida,x1,x2);
+
+		//Valores del nodoA actual:
+		int d1 = nodoA->dato /100;
+		int d2 = nodoA->dato %100;
+
+		//Llamado recursivo hijo izq (para llegar al menor nodoA, primero)
+		transformarAVL(arbol,nodoA->hijoIzquierdo,listaSalida);
+		//agregaremos nodos a una lista y trabajaremos la lista
+		//Caso en que nuestra listaSalida esté vacía
+		if (listaSalida->inicio == NULL){
+			insertarInicio(listaSalida,d1,d2);
+		}
+		//Operaciones sobre el nodo
+		if (auxiliar != NULL){
+			if (d1 <= auxiliar->dato2){
+				//Si el dato2 de la lista es mayor que el dato1 del nodoA 
+				//entonces, el dato2 de la lista pasa a ser el dato2 del AVL
+				auxiliar->dato2 = d2;
+			}
+			else{//Sino, se corta ahí el nodo y se crea otro nuevo
+				insertarNodoFinal(listaSalida,d1,d2);
+			}
+		}
+		//Llamado recursivo caso hijo der (para llegar al mayor nodoA, al final)
+		transformarAVL(arbol,nodoA->hijoDerecho,listaSalida);
 	}
 }
 //AVLToLista, función que transforma los datos de un arbolAVL y los escribe en una lista
@@ -90,8 +102,8 @@ TDAlista* AVLToLista(TDAarbolAVL* arbol){
 		//Creamos una lista Vacía
 		TDAlista* listaSalida = crearListaVacia();
 		//Llamamos a la función recursiva
-    	transformarAVL(arbol,arbol->inicio,listaSalida,0,8);
-		return listaSalida;
+    	transformarAVL(arbol,arbol->inicio,listaSalida);
+		return listaSalida;printf("b");
 	}
 	else{
 		printf("El árbol AVL está vacío\n");
@@ -108,7 +120,9 @@ void escribirSalida(const char* archivoSalida, TDAlista* listaE){
 		fprintf(archivo,"%d",aux->dato);
 		fprintf(archivo,"%s"," ");
 		fprintf(archivo,"%d",aux->dato2);
+		if(aux->siguiente!=NULL){//Para no generar "\n" de más 
 		fprintf(archivo,"%s","\n");
+		}
 		aux = aux->siguiente;
 	}
 	fclose(archivo);

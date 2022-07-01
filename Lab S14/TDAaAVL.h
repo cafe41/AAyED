@@ -451,7 +451,52 @@ void insertarNodoAVL(TDAarbolAVL* arbol, int dato)
 
 
 /*** -------- actividad 3 ---------- ***/
-void eliminarNodoAVL(TDAarbolAVL* arbol, int dato);
+void eliminarNodoAVL(TDAarbolAVL* arbol, int dato){
+  nodoAVL* nodo = buscarNodoAVL(arbol,dato);
+  if (nodo != NULL){
+    if (nodo->hijoIzquierdo == NULL && nodo->hijoDerecho == NULL){
+      if (nodo->padre->hijoIzquierdo == nodo){
+        nodo->padre->hijoIzquierdo = NULL;
+      }
+      else if (nodo->padre->hijoDerecho == nodo){
+        nodo->padre->hijoDerecho = NULL;
+      }
+      free(nodo);
+    }
+    else if (nodo->hijoIzquierdo == NULL || nodo->hijoDerecho == NULL){
+      if (nodo->hijoIzquierdo == NULL){
+        if (nodo->padre->hijoIzquierdo == nodo){
+          nodo->padre->hijoIzquierdo = nodo->hijoDerecho;
+          nodo->hijoDerecho->padre = nodo->padre;
+        }
+        else if (nodo->padre->hijoDerecho == nodo){
+          nodo->padre->hijoDerecho = nodo->hijoDerecho;
+          nodo->hijoDerecho->padre = nodo->padre;
+        }
+        free(nodo);
+      }
+      else if (nodo->hijoDerecho == NULL){
+        if (nodo->padre->hijoIzquierdo == nodo){
+          nodo->padre->hijoIzquierdo = nodo->hijoIzquierdo;
+          nodo->hijoIzquierdo->padre = nodo->padre;
+        }
+        else if (nodo->padre->hijoDerecho == nodo){
+          nodo->padre->hijoDerecho = nodo->hijoIzquierdo;
+          nodo->hijoIzquierdo->padre = nodo->padre;
+        }
+        free(nodo);
+      }
+    }
+    else{
+      nodoAVL* aux = nodo->hijoIzquierdo;
+      while (aux->hijoDerecho != NULL){
+        aux = aux->hijoDerecho;
+      }
+      nodo->dato = aux->dato;
+      eliminarNodoAVL(arbol,aux->dato);
+    }
+  }
+}
 
 /*** -------- funciones extra -------- ***/
 

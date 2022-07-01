@@ -44,6 +44,8 @@ int main() {
 			printf("El arbol esta balanceado\n");
 		}
 	}
+
+	eliminarNodoAVL(arbolAVL,12);
 	
 	printf("\n");recorridoInordenAVL(arbolAVL);
 
