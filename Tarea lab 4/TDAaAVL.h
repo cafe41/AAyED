@@ -131,6 +131,13 @@ void imprimirNodo(nodoAVL* nodo){
 	else{printf("hijo der: %d\n",nodo->hijoDerecho->dato);}
 }
 
+void imprimirNodoPreOrden(TDAarbolAVL* arbol, nodoAVL* nodo){
+  if (nodo!=NULL){
+  imprimirNodo(nodo);
+  imprimirNodoPreOrden(arbol,nodo->hijoIzquierdo);
+  imprimirNodoPreOrden(arbol,nodo->hijoDerecho);}
+}
+
 /*------------------ operaciones de balance --------------------*/
 
 /***------------- actividad 1 -------------***/

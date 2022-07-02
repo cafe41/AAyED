@@ -64,7 +64,7 @@ void transformarAVL(TDAarbolAVL* arbol, nodoAVL* nodoA, TDAlista* listaSalida){
 		nodo* auxiliar = listaSalida->inicio;
 		if (auxiliar != NULL){
 			while (auxiliar->siguiente!=NULL){
-			auxiliar = auxiliar->siguiente;
+				auxiliar = auxiliar->siguiente;
 			}
 		}
 
@@ -103,7 +103,7 @@ TDAlista* AVLToLista(TDAarbolAVL* arbol){
 		TDAlista* listaSalida = crearListaVacia();
 		//Llamamos a la función recursiva
     	transformarAVL(arbol,arbol->inicio,listaSalida);
-		return listaSalida;printf("b");
+		return listaSalida;
 	}
 	else{
 		printf("El árbol AVL está vacío\n");
@@ -149,11 +149,12 @@ void main(int argc, char const *argv[]){
 	recuperarBalanceAVL(arbolito,nodoMenorAlturaAVL(arbolito)); 
 	//PASAMOS LO DEL AVL, YA ORDENADO A UNA LISTA
 	TDAlista* listaSalida = AVLToLista(arbolito); //Plan B: pasar todo a un arreglo INORDEN
-	recorrerLista(listaSalida);
+	if (listaSalida != NULL) {printf("La lista resultante es:\n");}
+	recorrerLista(listaSalida);printf("\n");
 	//Finalmente, escribimos la posicion y liberamos memoria
 	//ESCRIBIR EN ARCHIVO DE SALIDA
 	escribirSalida(archivoSalida,listaSalida);
 	//LIBERAR MEMORIA
 	free(listaEntrada);free(arbolito);free(listaSalida);
-	printf("FIN\n");
+	printf("Fin del codigo, revise el archivo de salida\n");
 }

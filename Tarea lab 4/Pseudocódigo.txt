@@ -1,0 +1,85 @@
+archivoToLista(Arreglo(char) nombreArchivo): TDAlista
+    FILE archivo <- fopen(nombreArchivo,"r") ...fopen es una función para abrir archivos en C, en este caso se usa "r", que es para leer el archivo. 
+    
+    struct stat sb ...stat es parte de la biblioteca sys/stat
+    ...sirve para ver el estado del archivo (o eso entiendo).
+    stat(nombreArchivo, sb)
+
+    String file_contents <- malloc(sb.st_size) ...asigna la memoria del tamaño del archivo a file_contents
+    TDAlista listaEntrada <- crearListaVacia()
+    num d1, num d2 ...d1 y d2 son los datos a meter al nodo
+
+    WHILE (fscanf(archivo, "num num", d1, d2) <> EOF) DO
+        ...Este while va recorriendo linea por linea hasta que sea distinto de EOF
+        ...EOF es "End Of File", se refiere al final del archivo
+        ...Puede parecer raro un llamado recursivo dentro de una condición.
+        insertarNodo(listaEntrada,d1,d2)...inserta ambos datos dentro de un nodo
+        ...y luego inserta el nodo a la lista de entrada
+
+    fclose(archivo) ...cerramos el archivo
+    RETURN (listaEntrada) ...retornamos la lista de entrada
+
+listaToAVL(TDAlista listaE): TDAarbolAVL ...listaE = listaEnlazada
+    TDAarbolAVL arbol <- crearAVLVacio()
+    nodo auxiliar <- listaE->inicio
+    
+    WHILE (auxiliar <> NULL) DO
+        num d1d2 <- (auxiliar->dato * 100) + auxiliar->dato2
+        insertarNodoAVL(arbol,d1d2)
+        auxiliar <- auxiliar->siguiente
+    
+    RETURN (arbol)
+
+transformarAVL(TDAarbolAVL arbol, nodoAVL nodoArbol,TDAlista lista): VOID
+    IF (nodoArbol <> NULL) THEN
+        nodo auxiliar<- listaSalida->inicio ...nodo de lista
+        ...agregaremos nodos a una lista y trabajaremos la lista
+        IF (auxiliar <> NULL) THEN
+			WHILE (auxiliar->siguiente!=NULL) DO
+			    auxiliar = auxiliar->siguiente; ...recorre hasta el final de la lista
+			
+        ...asignamos los valores del nodoArbol a variables.    
+		num d1 <- (nodoA->dato / 100)
+		num d2 <- (nodoA->dato % 100)
+
+		...Llamado recursivo hijo izq (para llegar al nodo menor)
+		transformarAVL(arbol,nodoArbol->hijoIzquierdo,lista)
+
+		...Caso en el que lista esté vacía
+		IF (lista->inicio = NULL) THEN
+			insertarNodo(lista,d1,d2) ...insertamos el nodo con d1 y d2 en la lista
+		
+		...Operaciones 1 y 2 sobre el nodo
+		IF (auxiliar <> NULL) THEN
+			IF (d1 <= auxiliar->dato2) THEN ... Si d1 < o = que auxiliar->dato2
+				...Si el dato2 de la lista es mayor que el dato1 del nodoA 
+				...entonces, el dato2 de la lista pasa a ser el dato2 del AVL
+				auxiliar->dato2 <- d2;
+			
+			ELSE ...Sino, se corta ahí el nodo y se crea otro nuevo
+				insertarNodo(lista,d1,d2)
+			
+		...Llamado recursivo caso hijo der (para llegar al nodo final)
+		transformarAVL(arbol,nodoArbol->hijoDerecho,lista)
+
+AVLToLista(TDAarbolAVL arbol): TDAlista
+    IF (! esAVLvacio(arbol)) THEN...si el arbol no está vacío
+        TDAlista listaSalida <- crearListaVacia() ...asignamos memoria a una lista vacía
+        ...Llamamos a la función de arriba
+        transformarAVL(arbol, arbol->inicio, listaSalida)
+        RETURN listaSalida
+
+    ELSE 
+        imprimir("El arbol está vacío")
+
+escribirSalida(String archivoSalida, TDAlista listaE): VOID
+    FILE archivo <- fopen(archivoSalida, "w") ...abrimos el archivo en modo escribir 
+    nodo aux <- listaE->inicio
+    WHILE (aux <> NULL) DO
+        ...fprintf escribe las lineas dentro de un archivo
+        fprintf(aux->dato)
+        fprintf(" ")
+        fprintf(aux->dato2)
+        fprintf("\n")
+        aux <- aux->siguiente ..."itera" el ciclo
+    fclose(archivo) ...cerramos el archivo
